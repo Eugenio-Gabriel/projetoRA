@@ -3,18 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌀 Estágio Oculto</title>
+  <title>Estágio Oculto 🌸</title>
 
-  <!-- Scripts principais do A-Frame e AR.js -->
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+  <!-- MediaPipe Hands -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
 
   <style>
-    body { 
-      margin: 0; 
-      overflow: hidden; 
-      font-family: 'Poppins', sans-serif; 
-      background: black;
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      background: #f5e4b8;
     }
 
     h2 {
@@ -22,82 +26,139 @@
       top: 15px;
       left: 50%;
       transform: translateX(-50%);
-      color: #e2e2e2;
+      color: #3b3820;
       font-weight: 700;
-      letter-spacing: 1px;
-      text-shadow: 0 0 10px #0ff;
-      z-index: 1000;
+      font-size: clamp(18px, 5vw, 22px);
+      z-index: 10;
     }
 
     #backBtn {
       position: fixed;
       top: 15px;
       left: 15px;
-      background: rgba(255, 255, 255, 0.15);
+      background: linear-gradient(160deg, #f6d36b, #d5a55a);
       border-radius: 50%;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-      width: 50px;
-      height: 50px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: 0.3s;
-      z-index: 1000;
+      transition: 0.2s ease;
+      z-index: 10;
     }
 
     #backBtn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
     }
 
     #backBtn svg {
-      width: 28px;
-      height: 28px;
-      stroke: #fff;
-      stroke-width: 2;
+      width: 26px;
+      height: 26px;
+      stroke: #3b2b1f;
+      stroke-width: 2.5;
       fill: none;
+    }
+
+    video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      transform: scaleX(-1);
+      z-index: 1;
+    }
+
+    a-scene {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 2;
     }
   </style>
 </head>
 
 <body>
-  <!-- Título -->
-  <h2>🌀 Estágio Oculto</h2>
+  <h2>Estágio Oculto</h2>
 
-  <!-- Botão de voltar -->
   <div id="backBtn">
     <svg viewBox="0 0 24 24">
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </div>
 
-  <!-- Cena AR -->
-  <a-scene embedded arjs="sourceType: webcam;">
-    <a-entity camera></a-entity>
+  <!-- Feed da câmera -->
+  <video id="input_video" autoplay></video>
 
-    <!-- Marcador Hiro -->
-    <a-marker preset="hiro">
-      <a-sphere position="0 0.5 0" radius="0.3" color="#00ffff" opacity="0.7">
-        <a-animation 
-          attribute="scale"
-          dur="2000"
-          values="1 1 1; 1.3 1.3 1.3; 1 1 1"
-          repeat="indefinite">
-        </a-animation>
-      </a-sphere>
-    </a-marker>
-
-    <a-light type="ambient" color="#ffffff" intensity="2"></a-light>
-    <a-light type="directional" intensity="0.8" position="-1 4 5"></a-light>
+  <!-- Cena AR (modelo escondido inicialmente) -->
+  <a-scene embedded vr-mode-ui="enabled: false">
+    <a-entity id="flower"
+      gltf-model="url(assets/florzinha.glb)"
+      position="0 0 -1.5"
+      scale="0.6 0.6 0.6"
+      visible="false"
+      animation-mixer>
+    </a-entity>
+    <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1" position="0 2 3"></a-light>
   </a-scene>
 
   <script>
+    const flower = document.getElementById("flower");
+    const videoElement = document.getElementById("input_video");
+
+    // Função para detectar se a mão está aberta (usando a distância entre o polegar e o mínimo)
+    function isHandOpen(landmarks) {
+      const thumbTip = landmarks[4];
+      const pinkyTip = landmarks[20];
+      const distance = Math.hypot(
+        thumbTip.x - pinkyTip.x,
+        thumbTip.y - pinkyTip.y
+      );
+      return distance > 0.3; // se a distância for grande, mão aberta
+    }
+
+    // Inicializa o MediaPipe Hands
+    const hands = new Hands({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+      },
+    });
+
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.6,
+    });
+
+    hands.onResults((results) => {
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        const hand = results.multiHandLandmarks[0];
+        const open = isHandOpen(hand);
+        flower.setAttribute("visible", open);
+      } else {
+        flower.setAttribute("visible", false);
+      }
+    });
+
+    // Inicializa a câmera
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await hands.send({ image: videoElement });
+      },
+      width: 640,
+      height: 480,
+    });
+    camera.start();
+
     // Botão de voltar
     document.getElementById('backBtn').addEventListener('click', () => {
-      window.location.href = "index.html"; // volta para a página principal
+      window.location.href = "index.html";
     });
   </script>
 </body>
