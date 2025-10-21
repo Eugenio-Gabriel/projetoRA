@@ -146,13 +146,16 @@
       }
     });
 
-    // Solicita permissão de câmera e inicia o MediaPipe
+    // Solicita permissão de câmera traseira e inicia o MediaPipe
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: "environment" } }, // 👈 força a câmera traseira
+          audio: false
+        });
         videoElement.srcObject = stream;
         await videoElement.play();
-        console.log("✅ Câmera iniciada com sucesso!");
+        console.log("✅ Câmera traseira iniciada com sucesso!");
 
         const camera = new Camera(videoElement, {
           onFrame: async () => {
@@ -163,12 +166,11 @@
         });
         camera.start();
       } catch (err) {
-        console.error("❌ Erro ao acessar a câmera:", err);
-        alert("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
+        console.error("❌ Erro ao acessar a câmera traseira:", err);
+        alert("Não foi possível acessar a câmera traseira. Verifique as permissões do navegador.");
       }
     }
 
-    // Inicia o processo
     startCamera();
 
     // Botão de voltar
