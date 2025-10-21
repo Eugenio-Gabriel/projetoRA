@@ -81,122 +81,120 @@
   <div class="hint">Abra a mão para aparecer a florzinha 🌸</div>
 
   <script>
-    const video = document.getElementById('inputVideo');
-    const modelEl = document.getElementById('flower');
-    const camEl = document.getElementById('cam');
+  const video = document.getElementById('inputVideo');
+  const modelEl = document.getElementById('flower');
+  const camEl = document.getElementById('cam');
 
-    // ---- Detector de mão aberta (heurística leve)
-    function isHandOpen(landmarks){
-      // Considera dedos estendidos comparando pontas (tip) com juntas (pip)
-      const FINGERS = [
-        {tip:8, pip:6},   // indicador
-        {tip:12, pip:10}, // médio
-        {tip:16, pip:14}, // anelar
-        {tip:20, pip:18}  // mínimo
-      ];
-      let extended = 0;
-      for(const f of FINGERS){
-        if(landmarks[f.tip].y < landmarks[f.pip].y) extended++; // y menor = mais alto na imagem
+  // ---- Detector de mão aberta (heurística leve)
+  function isHandOpen(landmarks){
+    const FINGERS = [
+      {tip:8, pip:6}, {tip:12, pip:10}, {tip:16, pip:14}, {tip:20, pip:18}
+    ];
+    let extended = 0;
+    for(const f of FINGERS){
+      if(landmarks[f.tip].y < landmarks[f.pip].y) extended++;
+    }
+    const dThumb = Math.hypot(
+      landmarks[4].x - landmarks[2].x,
+      landmarks[4].y - landmarks[2].y
+    );
+    const thumbOpen = dThumb > 0.08;
+    return extended >= 3 && thumbOpen;
+  }
+
+  function palmCenter(landmarks){
+    const idx = [0,1,5,9,13,17];
+    let x=0,y=0;
+    idx.forEach(i=>{x+=landmarks[i].x;y+=landmarks[i].y;});
+    return {x:x/idx.length, y:y/idx.length};
+  }
+
+  function placeAtScreenPoint(nx, ny, distanceMeters=0.6){
+    const threeCam = camEl.getObject3D('camera');
+    if(!threeCam) return;
+    const ndcX = nx*2 - 1;
+    const ndcY = -(ny*2 - 1);
+    const vec = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(threeCam);
+    const dir = vec.sub(threeCam.position).normalize();
+    const pos = threeCam.position.clone().add(dir.multiplyScalar(distanceMeters));
+    modelEl.object3D.position.copy(pos);
+  }
+
+  const hands = new Hands({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+  });
+  hands.setOptions({
+    maxNumHands: 1,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.6
+  });
+
+  hands.onResults(res=>{
+    if(res.multiHandLandmarks && res.multiHandLandmarks.length){
+      const lm = res.multiHandLandmarks[0];
+      const open = isHandOpen(lm);
+      modelEl.setAttribute('visible', open);
+      if(open){
+        const c = palmCenter(lm);
+        placeAtScreenPoint(c.x, c.y);
       }
-      // Polegar: distância tip(4) até base(2) relativamente grande
-      const dThumb = Math.hypot(
-        landmarks[4].x - landmarks[2].x,
-        landmarks[4].y - landmarks[2].y
-      );
-      const thumbOpen = dThumb > 0.08;
-      return extended >= 3 && thumbOpen; // ~mão aberta
+    }else{
+      modelEl.setAttribute('visible', false);
     }
+  });
 
-    // ---- Pega um ponto representativo da palma (média de alguns pontos)
-    function palmCenter(landmarks){
-      const idx = [0, 1, 5, 9, 13, 17]; // pontos centrais da palma
-      let x=0,y=0;
-      idx.forEach(i=>{ x+=landmarks[i].x; y+=landmarks[i].y; });
-      x/=idx.length; y/=idx.length;
-      return {x, y};
+  // 🔹 NOVO: botão manual para ativar câmera traseira
+  const btn = document.createElement("button");
+  btn.textContent = "Ativar Câmera Traseira 📷";
+  btn.style.position = "fixed";
+  btn.style.bottom = "15px";
+  btn.style.right = "15px";
+  btn.style.padding = "10px 16px";
+  btn.style.border = "none";
+  btn.style.borderRadius = "10px";
+  btn.style.background = "linear-gradient(160deg,#f6d36b,#d5a55a)";
+  btn.style.color = "#3b2b1f";
+  btn.style.fontWeight = "700";
+  btn.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+  btn.style.cursor = "pointer";
+  btn.style.zIndex = "20";
+  document.body.appendChild(btn);
+
+  async function startCamera(back=false){
+    try{
+      const constraints = back
+        ? {video:{facingMode:{exact:'environment'}}, audio:false}
+        : {video:true, audio:false};
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      video.srcObject = stream;
+      await video.play();
+
+      const cam = new Camera(video, {
+        onFrame: async ()=>{await hands.send({image:video});},
+        width:640, height:480
+      });
+      cam.start();
+
+      console.log('✅ Câmera iniciada', back ? '(traseira)' : '(automática)');
+    }catch(err){
+      console.error('❌ Erro ao acessar câmera:', err);
+      alert("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
     }
+  }
 
-    // ---- Projeta o ponto 2D (0..1) para 3D à frente da câmera
-    function placeAtScreenPoint(nx, ny, distanceMeters=0.6){
-      const threeCam = camEl.getObject3D('camera');
-      if(!threeCam) return;
+  // Botão ativa a traseira
+  btn.addEventListener('click', ()=>{
+    startCamera(true);
+    btn.style.display = "none"; // esconde depois de ativar
+  });
 
-      // NDC: (-1..1), invertendo Y pra coords de tela
-      const ndcX = nx*2 - 1;
-      const ndcY = -(ny*2 - 1);
+  // Voltar
+  document.getElementById('backBtn').addEventListener('click', ()=>{ window.location.href='index.html'; });
 
-      const vec = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(threeCam);
-      const dir = vec.sub(threeCam.position).normalize();
-      const pos = threeCam.position.clone().add(dir.multiplyScalar(distanceMeters));
+  // Inicia normal (frontal, se Safari travar)
+  startCamera(false);
+</script>
 
-      modelEl.object3D.position.copy(pos);
-    }
-
-    // ---- MediaPipe Hands
-    const hands = new Hands({
-      locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-    });
-    hands.setOptions({
-      maxNumHands: 1,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.6
-    });
-
-    hands.onResults(res=>{
-      if(res.multiHandLandmarks && res.multiHandLandmarks.length){
-        const lm = res.multiHandLandmarks[0];
-        const open = isHandOpen(lm);
-        modelEl.setAttribute('visible', open);
-        if(open){
-          const c = palmCenter(lm);     // c.x, c.y normalizados (0..1)
-          placeAtScreenPoint(c.x, c.y); // posiciona a flor na palma
-        }
-      }else{
-        modelEl.setAttribute('visible', false);
-      }
-    });
-
-    // ---- Câmera: tenta traseira por deviceId; fallback para facingMode
-    async function startCamera(){
-      try{
-        // Primeiro pede permissão com environment (ativa labels no iOS)
-        let stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
-        video.srcObject = stream;
-        await video.play();
-
-        // Tenta achar a câmera "back" e reabrir com deviceId (mais confiável no iOS)
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const cams = devices.filter(d=>d.kind==='videoinput');
-        const back = cams.find(c=>c.label.toLowerCase().includes('back')) || cams[0];
-
-        if(back){
-          const exact = await navigator.mediaDevices.getUserMedia({ video:{ deviceId:{ exact: back.deviceId } }, audio:false });
-          video.srcObject = exact; // troca para a traseira garantida
-          await video.play();
-          stream.getTracks().forEach(t=>t.stop()); // encerra a anterior
-          stream = exact;
-        }
-
-        // Inicia o loop do MediaPipe
-        const cam = new Camera(video, {
-          onFrame: async () => { await hands.send({ image: video }); },
-          width: 640, height: 480
-        });
-        cam.start();
-
-        console.log('✅ Câmera OK');
-      }catch(err){
-        console.error('❌ Erro câmera:', err);
-        alert('Não foi possível acessar a câmera. Verifique as permissões do navegador.');
-      }
-    }
-
-    // Voltar
-    document.getElementById('backBtn').addEventListener('click', ()=>{ window.location.href='index.html'; });
-
-    // GO!
-    startCamera();
-  </script>
 </body>
 </html>
