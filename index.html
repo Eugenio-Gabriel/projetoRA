@@ -204,7 +204,7 @@
       model.setAttribute("rotation", `${rotation.x} ${rotation.y} ${rotation.z}`);
     });
 
-    // Voltar à posição inicial com duplo clique (funciona todas as vezes)
+    // Voltar à posição inicial com duplo clique
     document.addEventListener('dblclick', () => {
       // Remove animações antigas completamente
       model.removeAttribute('animation__pos');
@@ -226,9 +226,9 @@
         easing: 'easeInOutQuad'
       });
 
-      rotation = { ...initialRotation }; // Reseta rotação atual
+      rotation = { ...initialRotation };
 
-      // Efeito de "pulso" visual leve
+      // Pequeno pulso visual (sem cor)
       model.setAttribute('animation__glow', {
         property: 'scale',
         from: '0.2 0.2 0.2',
@@ -238,21 +238,6 @@
         easing: 'easeInOutSine',
         loop: 2
       });
-
-      // Brilho temporário dourado
-      const mesh = model.getObject3D('mesh');
-      if (mesh) {
-        mesh.traverse(node => {
-          if (node.isMesh && node.material) {
-            const originalEmissive = node.material.emissive ? node.material.emissive.clone() : null;
-            node.material.emissive = new THREE.Color(0xffcc66);
-            setTimeout(() => {
-              if (originalEmissive) node.material.emissive.copy(originalEmissive);
-              else node.material.emissive.setRGB(0, 0, 0);
-            }, 800);
-          }
-        });
-      }
     });
 
     startBtn.addEventListener('click', () => {
@@ -260,6 +245,7 @@
     });
   });
 </script>
+
 
 </body>
 </html>
