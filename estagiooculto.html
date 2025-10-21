@@ -41,6 +41,12 @@
     const canvasCtx = canvasElement.getContext('2d');
     const model = document.getElementById('model');
 
+    // 🔹 Canvas auxiliar para espelhar o frame (necessário no iPhone com câmera traseira)
+    const mirrorCanvas = document.createElement("canvas");
+    const mirrorCtx = mirrorCanvas.getContext("2d");
+    mirrorCanvas.width = 640;
+    mirrorCanvas.height = 480;
+
     // Configura MediaPipe Hands
     const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
     hands.setOptions({
@@ -67,11 +73,18 @@
       }
     }
 
+    // 🔹 Espelha o frame antes de enviar ao MediaPipe
     async function processFrame() {
-      await hands.send({ image: videoElement });
+      mirrorCtx.save();
+      mirrorCtx.scale(-1, 1);
+      mirrorCtx.drawImage(videoElement, -mirrorCanvas.width, 0, mirrorCanvas.width, mirrorCanvas.height);
+      mirrorCtx.restore();
+
+      await hands.send({ image: mirrorCanvas });
       requestAnimationFrame(processFrame);
     }
 
+    // Exibe e processa a detecção
     function onResults(results) {
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -80,18 +93,14 @@
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         const hand = results.multiHandLandmarks[0];
 
-        // Detecta se a palma está aberta
+        // Detecta se a palma está aberta (mesma lógica anterior)
         const openPalm =
           hand[8].y < hand[6].y &&
           hand[12].y < hand[10].y &&
           hand[16].y < hand[14].y &&
           hand[20].y < hand[18].y;
 
-        if (openPalm) {
-          model.setAttribute('visible', 'true');
-        } else {
-          model.setAttribute('visible', 'false');
-        }
+        model.setAttribute('visible', openPalm ? 'true' : 'false');
 
         drawConnectors(canvasCtx, hand, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 3 });
         drawLandmarks(canvasCtx, hand, { color: '#FF0000', lineWidth: 1 });
