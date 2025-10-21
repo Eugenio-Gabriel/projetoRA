@@ -3,28 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>🌿 Palma AR (Câmera Traseira)</title>
+  <title>🌿 Palma AR com Câmera Estilo Hiro</title>
 
-  <!-- A-Frame -->
+  <!-- A-Frame + AR.js -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
   <!-- MediaPipe Hands -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 
   <style>
-    body, html { margin:0; overflow:hidden; background:black; }
-    video, canvas { position:fixed; left:0; top:0; width:100vw; height:100vh; object-fit:cover; }
-    canvas { z-index:1; }
-    a-scene { position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:2; pointer-events:none; }
+    html, body { margin: 0; overflow: hidden; }
+    a-scene {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+    /* vídeo processado pelo AR.js (textura otimizada e leve correção de cor) */
+    #arjs-video {
+      filter: brightness(1.1) contrast(1.05) saturate(1.2);
+      object-fit: cover;
+      transform: scaleX(-1); /* espelha pra parecer câmera traseira real */
+    }
   </style>
 </head>
 
 <body>
-  <video id="video" autoplay playsinline muted></video>
-  <canvas id="output_canvas"></canvas>
-
-  <a-scene embedded vr-mode-ui="enabled: false">
+  <!-- Cena principal -->
+  <a-scene embedded arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;">
     <a-entity id="model"
       gltf-model="url(assets/onion_shrub.glb)"
       visible="false"
@@ -36,83 +44,55 @@
   </a-scene>
 
   <script>
-    const videoElement = document.getElementById('video');
-    const canvasElement = document.getElementById('output_canvas');
-    const canvasCtx = canvasElement.getContext('2d');
-    const model = document.getElementById('model');
-
-    // 🔹 Canvas auxiliar para espelhar o frame (necessário no iPhone com câmera traseira)
-    const mirrorCanvas = document.createElement("canvas");
-    const mirrorCtx = mirrorCanvas.getContext("2d");
-    mirrorCanvas.width = 640;
-    mirrorCanvas.height = 480;
-
-    // Configura MediaPipe Hands
+    // Configuração do MediaPipe Hands
     const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
     hands.setOptions({
       maxNumHands: 1,
       modelComplexity: 1,
-      minDetectionConfidence: 0.6,
-      minTrackingConfidence: 0.5
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.6
     });
-    hands.onResults(onResults);
 
-    // Função que inicia a câmera traseira manualmente
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' } },
-          audio: false
-        });
-        videoElement.srcObject = stream;
-        videoElement.onloadedmetadata = () => videoElement.play();
-        requestAnimationFrame(processFrame);
-        console.log('✅ Câmera traseira iniciada com sucesso!');
-      } catch (err) {
-        console.error('❌ Erro ao acessar a câmera:', err);
-      }
-    }
+    const model = document.getElementById('model');
+    const video = document.querySelector('video'); // AR.js cria internamente o <video>
 
-    // 🔹 Espelha o frame antes de enviar ao MediaPipe
-    async function processFrame() {
-      mirrorCtx.save();
-      mirrorCtx.scale(-1, 1);
-      mirrorCtx.drawImage(videoElement, -mirrorCanvas.width, 0, mirrorCanvas.width, mirrorCanvas.height);
-      mirrorCtx.restore();
+    // Aguardar a câmera do AR.js inicializar
+    video.addEventListener('loadeddata', () => {
+      console.log('✅ Câmera AR.js pronta');
+      processFrames();
+    });
 
-      await hands.send({ image: mirrorCanvas });
-      requestAnimationFrame(processFrame);
-    }
+    async function processFrames() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-    // Exibe e processa a detecção
-    function onResults(results) {
-      canvasCtx.save();
-      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      async function loop() {
+        // ajusta o canvas pro tamanho do vídeo
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        const hand = results.multiHandLandmarks[0];
-
-        // Detecta se a palma está aberta (mesma lógica anterior)
-        const openPalm =
-          hand[8].y < hand[6].y &&
-          hand[12].y < hand[10].y &&
-          hand[16].y < hand[14].y &&
-          hand[20].y < hand[18].y;
-
-        model.setAttribute('visible', openPalm ? 'true' : 'false');
-
-        drawConnectors(canvasCtx, hand, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 3 });
-        drawLandmarks(canvasCtx, hand, { color: '#FF0000', lineWidth: 1 });
-      } else {
-        model.setAttribute('visible', 'false');
+        await hands.send({ image: canvas });
+        requestAnimationFrame(loop);
       }
 
-      canvasCtx.restore();
-    }
+      hands.onResults(results => {
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+          const hand = results.multiHandLandmarks[0];
+          const openPalm =
+            hand[8].y < hand[6].y &&
+            hand[12].y < hand[10].y &&
+            hand[16].y < hand[14].y &&
+            hand[20].y < hand[18].y;
 
-    // Inicia tudo
-    startCamera();
+          model.setAttribute('visible', openPalm);
+        } else {
+          model.setAttribute('visible', false);
+        }
+      });
+
+      loop();
+    }
   </script>
 </body>
 </html>
