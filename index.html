@@ -180,28 +180,82 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const model = document.querySelector('#model');
-      const startBtn = document.getElementById('startBtn');
-      const startScreen = document.getElementById('startScreen');
-      let isPlaying = false;
-      let rotation = { x: 0, y: 0, z: 0 };
+  document.addEventListener('DOMContentLoaded', () => {
+    const model = document.querySelector('#model');
+    const startBtn = document.getElementById('startBtn');
+    const startScreen = document.getElementById('startScreen');
+    let isPlaying = false;
+    let rotation = { x: 0, y: 0, z: 0 };
 
-      model.addEventListener('click', () => {
-        model.setAttribute('animation-mixer', { timeScale: isPlaying ? 0 : 1 });
-        isPlaying = !isPlaying;
-      });
+    // Guarda posição e rotação iniciais
+    const initialPosition = model.getAttribute('position');
+    const initialRotation = model.getAttribute('rotation');
 
-      model.addEventListener("onefingermove", (event) => {
-        rotation.x += event.detail.positionChange.y * 0.5;
-        rotation.y += event.detail.positionChange.x * 0.5;
-        model.setAttribute("rotation", `${rotation.x} ${rotation.y} ${rotation.z}`);
-      });
-
-      startBtn.addEventListener('click', () => {
-        startScreen.style.display = "none";
-      });
+    // Iniciar/parar animação ao clicar
+    model.addEventListener('click', () => {
+      model.setAttribute('animation-mixer', { timeScale: isPlaying ? 0 : 1 });
+      isPlaying = !isPlaying;
     });
-  </script>
+
+    // Rotacionar com um dedo
+    model.addEventListener("onefingermove", (event) => {
+      rotation.x += event.detail.positionChange.y * 0.5;
+      rotation.y += event.detail.positionChange.x * 0.5;
+      model.setAttribute("rotation", `${rotation.x} ${rotation.y} ${rotation.z}`);
+    });
+
+    // Voltar à posição inicial com duplo clique + efeito visual
+    document.addEventListener('dblclick', () => {
+      model.removeAttribute('animation');
+
+      // Retorna posição e rotação
+      model.setAttribute('animation__pos', {
+        property: 'position',
+        to: `${initialPosition.x} ${initialPosition.y} ${initialPosition.z}`,
+        dur: 1000,
+        easing: 'easeInOutQuad'
+      });
+
+      model.setAttribute('animation__rot', {
+        property: 'rotation',
+        to: `${initialRotation.x} ${initialRotation.y} ${initialRotation.z}`,
+        dur: 1000,
+        easing: 'easeInOutQuad'
+      });
+
+      rotation = { ...initialRotation };
+
+      // Efeito de brilho (scale + emissive color)
+      model.setAttribute('animation__glow', {
+        property: 'scale',
+        to: '0.23 0.23 0.23',
+        dur: 400,
+        dir: 'alternate',
+        easing: 'easeInOutSine',
+        loop: 2
+      });
+
+      // Brilho dourado temporário
+      const mesh = model.getObject3D('mesh');
+      if (mesh) {
+        mesh.traverse(node => {
+          if (node.isMesh && node.material) {
+            const originalEmissive = node.material.emissive ? node.material.emissive.clone() : null;
+            node.material.emissive = new THREE.Color(0xffcc66);
+            setTimeout(() => {
+              if (originalEmissive) node.material.emissive.copy(originalEmissive);
+              else node.material.emissive.setRGB(0, 0, 0);
+            }, 800);
+          }
+        });
+      }
+    });
+
+    startBtn.addEventListener('click', () => {
+      startScreen.style.display = "none";
+    });
+  });
+</script>
+
 </body>
 </html>
