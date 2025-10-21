@@ -199,16 +199,19 @@
 
     // Rotacionar com um dedo
     model.addEventListener("onefingermove", (event) => {
-      rotation.x += event.detail.positionChange.y * 0.5;
-      rotation.y += event.detail.positionChange.x * 0.5;
+      rotation.x += event.detail.positionChange.y * 0.2;
+      rotation.y += event.detail.positionChange.x * 0.2;
       model.setAttribute("rotation", `${rotation.x} ${rotation.y} ${rotation.z}`);
     });
 
-    // Voltar à posição inicial com duplo clique
+    // Voltar à posição inicial com duplo clique (funciona todas as vezes)
     document.addEventListener('dblclick', () => {
-      model.removeAttribute('animation'); // Remove animações anteriores se existirem
+      // Remove animações antigas completamente
+      model.removeAttribute('animation__pos');
+      model.removeAttribute('animation__rot');
+      model.removeAttribute('animation__glow');
 
-      // Animação de retorno
+      // Cria novas animações de retorno
       model.setAttribute('animation__pos', {
         property: 'position',
         to: `${initialPosition.x} ${initialPosition.y} ${initialPosition.z}`,
@@ -223,7 +226,33 @@
         easing: 'easeInOutQuad'
       });
 
-      rotation = { ...initialRotation }; // reseta rotação
+      rotation = { ...initialRotation }; // Reseta rotação atual
+
+      // Efeito de "pulso" visual leve
+      model.setAttribute('animation__glow', {
+        property: 'scale',
+        from: '0.2 0.2 0.2',
+        to: '0.23 0.23 0.23',
+        dur: 400,
+        dir: 'alternate',
+        easing: 'easeInOutSine',
+        loop: 2
+      });
+
+      // Brilho temporário dourado
+      const mesh = model.getObject3D('mesh');
+      if (mesh) {
+        mesh.traverse(node => {
+          if (node.isMesh && node.material) {
+            const originalEmissive = node.material.emissive ? node.material.emissive.clone() : null;
+            node.material.emissive = new THREE.Color(0xffcc66);
+            setTimeout(() => {
+              if (originalEmissive) node.material.emissive.copy(originalEmissive);
+              else node.material.emissive.setRGB(0, 0, 0);
+            }, 800);
+          }
+        });
+      }
     });
 
     startBtn.addEventListener('click', () => {
