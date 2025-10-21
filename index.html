@@ -49,7 +49,6 @@
       margin: 1.2vh 0;
     }
 
-    /* Card do marcador */
     .marker-card {
       display: flex;
       flex-direction: column;
@@ -92,7 +91,6 @@
       display: block;
     }
 
-    /* Botão */
     #startBtn {
       margin-top: 3vh;
       padding: 1em 2.8em;
@@ -112,7 +110,7 @@
       box-shadow: 0 3px 0 #b3833c;
     }
 
-    .credit, .instruction {
+    .credit {
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
@@ -123,32 +121,56 @@
       font-size: clamp(10px, 3vw, 14px);
       white-space: nowrap;
       z-index: 999;
+      bottom: 10px;
     }
 
-    .credit { bottom: 10px; }
-    .instruction { top: 10px; }
     .credit a { color: #f7d46b; text-decoration: none; }
     .credit a:hover { text-decoration: underline; }
+
+    /* Olhinho líquido */
+    #liquidEye {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      z-index: 900;
+    }
+
+    #liquidEye:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    }
+
+    #liquidEye svg {
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+    }
   </style>
 </head>
 
 <body>
   <div id="startScreen">
     <h1>🌿 Experiência AR</h1>
-
     <p><b>Passo 1:</b> Imprima ou tire um print do marcador <b>Hiro</b> abaixo👇</p>
 
-    <!-- Card do marcador -->
     <div class="marker-card">
       <p class="marker-title">🪶 Marcador Hiro</p>
       <div class="marker-frame">
         <img src="assets/hiro.png" alt="Marcador Hiro" class="marker-img">
-        
       </div>
     </div>
 
     <p><b>Passo 2:</b> Toque em <b>Começar</b> e direcione a câmera para o marcador.</p>
-
     <p><b>Passo 3:</b> Interaja com o modelo 3D:<br>
       👉 Toque com um dedo para girar<br>
       👉 Use dois dedos para ajustar o tamanho
@@ -160,21 +182,33 @@
   <!-- Cena AR -->
   <a-scene embedded arjs="sourceType: webcam;" gesture-detector>
     <a-entity camera></a-entity>
+
     <a-marker preset="hiro">
       <a-entity id="model"
         gltf-model="url(assets/onion_shrub.glb)"
         scale="0.2 0.2 0.2"
-        position="0 2 0"
+        position="0 0 0"
         rotation="0 0 0"
         gesture-handler="minScale: 0.1; maxScale: 1;"
         animation-mixer="clip:*; loop: repeat; autoplay: false;">
       </a-entity>
+
       <a-light type="ambient" color="#ffffff" intensity="2"></a-light>
       <a-light type="directional" intensity="0.8" position="-1 4 5"></a-light>
     </a-marker>
   </a-scene>
 
-  <div class="instruction">👉 Toque no objeto para iniciar/parar a animação</div>
+  <!-- Olhinho líquido no canto superior direito -->
+  <div id="liquidEye">
+    <svg viewBox="0 0 64 64" width="50" height="50">
+      <path d="M32 12C18 12 6 24 6 32s12 20 26 20 26-12 26-20S46 12 32 12z" 
+            fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+      <circle cx="32" cy="32" r="8" fill="rgba(255,255,255,0.8)">
+        <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+
   <div class="credit">
     Modelo 3D por <a href="https://sketchfab.com/3d-models/onion-shrub-0be82a8f365b45dcbd25c6e395b4ec5d" target="_blank">DogOnAKeyboard</a>
   </div>
@@ -184,34 +218,29 @@
     const model = document.querySelector('#model');
     const startBtn = document.getElementById('startBtn');
     const startScreen = document.getElementById('startScreen');
+    const liquidEye = document.getElementById('liquidEye');
     let isPlaying = false;
     let rotation = { x: 0, y: 0, z: 0 };
 
-    // Guarda posição e rotação iniciais
     const initialPosition = model.getAttribute('position');
     const initialRotation = model.getAttribute('rotation');
 
-    // Iniciar/parar animação ao clicar
     model.addEventListener('click', () => {
       model.setAttribute('animation-mixer', { timeScale: isPlaying ? 0 : 1 });
       isPlaying = !isPlaying;
     });
 
-    // Rotacionar com um dedo
     model.addEventListener("onefingermove", (event) => {
       rotation.x += event.detail.positionChange.y * 0.2;
       rotation.y += event.detail.positionChange.x * 0.2;
       model.setAttribute("rotation", `${rotation.x} ${rotation.y} ${rotation.z}`);
     });
 
-    // Voltar à posição inicial com duplo clique
     document.addEventListener('dblclick', () => {
-      // Remove animações antigas completamente
       model.removeAttribute('animation__pos');
       model.removeAttribute('animation__rot');
       model.removeAttribute('animation__glow');
 
-      // Cria novas animações de retorno
       model.setAttribute('animation__pos', {
         property: 'position',
         to: `${initialPosition.x} ${initialPosition.y} ${initialPosition.z}`,
@@ -228,7 +257,6 @@
 
       rotation = { ...initialRotation };
 
-      // Pequeno pulso visual (sem cor)
       model.setAttribute('animation__glow', {
         property: 'scale',
         from: '0.2 0.2 0.2',
@@ -243,9 +271,12 @@
     startBtn.addEventListener('click', () => {
       startScreen.style.display = "none";
     });
+
+    // Novo: clicar no olhinho abre nova cena AR
+    liquidEye.addEventListener('click', () => {
+      window.location.href = "estagiooculto.html"; 
+    });
   });
-</script>
-
-
+  </script>
 </body>
 </html>

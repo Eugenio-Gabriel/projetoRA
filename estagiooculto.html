@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌀 Estágio Oculto</title>
+
+  <!-- Scripts principais do A-Frame e AR.js -->
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: 'Poppins', sans-serif; 
+      background: black;
+    }
+
+    h2 {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e2e2e2;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px #0ff;
+      z-index: 1000;
+    }
+
+    #backBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    #backBtn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    }
+
+    #backBtn svg {
+      width: 28px;
+      height: 28px;
+      stroke: #fff;
+      stroke-width: 2;
+      fill: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Título -->
+  <h2>🌀 Estágio Oculto</h2>
+
+  <!-- Botão de voltar -->
+  <div id="backBtn">
+    <svg viewBox="0 0 24 24">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </div>
+
+  <!-- Cena AR -->
+  <a-scene embedded arjs="sourceType: webcam;">
+    <a-entity camera></a-entity>
+
+    <!-- Marcador Hiro -->
+    <a-marker preset="hiro">
+      <a-sphere position="0 0.5 0" radius="0.3" color="#00ffff" opacity="0.7">
+        <a-animation 
+          attribute="scale"
+          dur="2000"
+          values="1 1 1; 1.3 1.3 1.3; 1 1 1"
+          repeat="indefinite">
+        </a-animation>
+      </a-sphere>
+    </a-marker>
+
+    <a-light type="ambient" color="#ffffff" intensity="2"></a-light>
+    <a-light type="directional" intensity="0.8" position="-1 4 5"></a-light>
+  </a-scene>
+
+  <script>
+    // Botão de voltar
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = "index.html"; // volta para a página principal
+    });
+  </script>
+</body>
+</html>
