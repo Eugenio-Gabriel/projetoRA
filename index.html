@@ -204,11 +204,11 @@
       model.setAttribute("rotation", `${rotation.x} ${rotation.y} ${rotation.z}`);
     });
 
-    // Voltar à posição inicial com duplo clique + efeito visual
+    // Voltar à posição inicial com duplo clique
     document.addEventListener('dblclick', () => {
-      model.removeAttribute('animation');
+      model.removeAttribute('animation'); // Remove animações anteriores se existirem
 
-      // Retorna posição e rotação
+      // Animação de retorno
       model.setAttribute('animation__pos', {
         property: 'position',
         to: `${initialPosition.x} ${initialPosition.y} ${initialPosition.z}`,
@@ -223,32 +223,7 @@
         easing: 'easeInOutQuad'
       });
 
-      rotation = { ...initialRotation };
-
-      // Efeito de brilho (scale + emissive color)
-      model.setAttribute('animation__glow', {
-        property: 'scale',
-        to: '0.23 0.23 0.23',
-        dur: 400,
-        dir: 'alternate',
-        easing: 'easeInOutSine',
-        loop: 2
-      });
-
-      // Brilho dourado temporário
-      const mesh = model.getObject3D('mesh');
-      if (mesh) {
-        mesh.traverse(node => {
-          if (node.isMesh && node.material) {
-            const originalEmissive = node.material.emissive ? node.material.emissive.clone() : null;
-            node.material.emissive = new THREE.Color(0xffcc66);
-            setTimeout(() => {
-              if (originalEmissive) node.material.emissive.copy(originalEmissive);
-              else node.material.emissive.setRGB(0, 0, 0);
-            }, 800);
-          }
-        });
-      }
+      rotation = { ...initialRotation }; // reseta rotação
     });
 
     startBtn.addEventListener('click', () => {
