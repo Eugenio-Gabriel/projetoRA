@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estágio Oculto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>🌱 Experiência AR – Mão Aberta</title>
 
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -14,169 +14,189 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-      background: #f5e4b8;
+    :root { --bg:#f5e4b8; --text:#3b3820; }
+    body{ margin:0; overflow:hidden; font-family:'Poppins',sans-serif; background:var(--bg); }
+    /* Header padrão */
+    .header{
+      position:fixed; inset:15px auto auto 50%; transform:translateX(-50%);
+      color:var(--text); font-weight:800; font-size:clamp(18px,5vw,22px); z-index:10;
+      text-shadow:1px 1px 0 rgba(255,255,255,.6);
+    }
+    /* Voltar */
+    #backBtn{
+      position:fixed; top:15px; left:15px; z-index:10;
+      width:48px; height:48px; border-radius:50%;
+      background:linear-gradient(160deg,#f6d36b,#d5a55a);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 8px rgba(0,0,0,.2); cursor:pointer; transition:.2s;
+    }
+    #backBtn:hover{ transform:scale(1.05); }
+    #backBtn svg{ width:26px; height:26px; stroke:#3b2b1f; stroke-width:2.5; fill:none; }
+
+    /* Feed da câmera (atrás da cena) */
+    video{
+      position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover;
+      z-index:1; /* sem espelhar, pra bater com as coords do iOS/Android traseira */
     }
 
-    h2 {
-      position: fixed;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #3b3820;
-      font-weight: 700;
-      font-size: clamp(18px, 5vw, 22px);
-      z-index: 10;
-    }
+    /* Cena A-Frame sobre o vídeo */
+    a-scene{ position:fixed; inset:0; z-index:2; }
 
-    #backBtn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      background: linear-gradient(160deg, #f6d36b, #d5a55a);
-      border-radius: 50%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: 0.2s ease;
-      z-index: 10;
-    }
-
-    #backBtn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    #backBtn svg {
-      width: 26px;
-      height: 26px;
-      stroke: #3b2b1f;
-      stroke-width: 2.5;
-      fill: none;
-    }
-
-    video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: 1;
-      transform: scaleX(-1);
-    }
-
-    a-scene {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 2;
+    /* Hint discreto */
+    .hint{
+      position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,.45); color:#fff; padding:6px 10px; border-radius:10px;
+      font-size:12px; z-index:10;
     }
   </style>
 </head>
-
 <body>
-  <h2>Estágio Oculto</h2>
-
-  <div id="backBtn">
-    <svg viewBox="0 0 24 24">
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
+  <div class="header">Experiência AR</div>
+  <div id="backBtn" title="Voltar">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
   </div>
 
-  <!-- Feed da câmera -->
-  <video id="input_video" autoplay playsinline muted></video>
+  <!-- Vídeo da câmera (traseira) -->
+  <video id="inputVideo" autoplay playsinline muted></video>
 
-  <!-- Cena AR (modelo escondido inicialmente) -->
-  <a-scene embedded vr-mode-ui="enabled: false">
+  <!-- Cena A-Frame -->
+  <a-scene embedded vr-mode-ui="enabled:false">
+    <a-entity id="cameraRig">
+      <a-entity id="cam" camera look-controls position="0 1.6 0"></a-entity>
+    </a-entity>
+
+    <!-- Modelo (invisível até detectar mão aberta) -->
     <a-entity id="flower"
       gltf-model="url(assets/florzinha.glb)"
-      position="0 0 -1.5"
       scale="0.6 0.6 0.6"
       visible="false"
       animation-mixer>
     </a-entity>
-    <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="1" position="0 2 3"></a-light>
+
+    <!-- Luzes básicas -->
+    <a-entity light="type:ambient; intensity:1.4; color:#ffffff"></a-entity>
+    <a-entity light="type:directional; intensity:1; color:#ffffff" position="0 2 3"></a-entity>
   </a-scene>
 
-  <script>
-    const flower = document.getElementById("flower");
-    const videoElement = document.getElementById("input_video");
+  <div class="hint">Abra a mão para aparecer a florzinha 🌸</div>
 
-    // Detecta se a mão está aberta (usando distância entre polegar e mínimo)
-    function isHandOpen(landmarks) {
-      const thumbTip = landmarks[4];
-      const pinkyTip = landmarks[20];
-      const distance = Math.hypot(
-        thumbTip.x - pinkyTip.x,
-        thumbTip.y - pinkyTip.y
+  <script>
+    const video = document.getElementById('inputVideo');
+    const modelEl = document.getElementById('flower');
+    const camEl = document.getElementById('cam');
+
+    // ---- Detector de mão aberta (heurística leve)
+    function isHandOpen(landmarks){
+      // Considera dedos estendidos comparando pontas (tip) com juntas (pip)
+      const FINGERS = [
+        {tip:8, pip:6},   // indicador
+        {tip:12, pip:10}, // médio
+        {tip:16, pip:14}, // anelar
+        {tip:20, pip:18}  // mínimo
+      ];
+      let extended = 0;
+      for(const f of FINGERS){
+        if(landmarks[f.tip].y < landmarks[f.pip].y) extended++; // y menor = mais alto na imagem
+      }
+      // Polegar: distância tip(4) até base(2) relativamente grande
+      const dThumb = Math.hypot(
+        landmarks[4].x - landmarks[2].x,
+        landmarks[4].y - landmarks[2].y
       );
-      return distance > 0.3; // se a distância for grande, mão aberta
+      const thumbOpen = dThumb > 0.08;
+      return extended >= 3 && thumbOpen; // ~mão aberta
     }
 
-    // Inicializa o MediaPipe Hands
-    const hands = new Hands({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-      },
-    });
+    // ---- Pega um ponto representativo da palma (média de alguns pontos)
+    function palmCenter(landmarks){
+      const idx = [0, 1, 5, 9, 13, 17]; // pontos centrais da palma
+      let x=0,y=0;
+      idx.forEach(i=>{ x+=landmarks[i].x; y+=landmarks[i].y; });
+      x/=idx.length; y/=idx.length;
+      return {x, y};
+    }
 
+    // ---- Projeta o ponto 2D (0..1) para 3D à frente da câmera
+    function placeAtScreenPoint(nx, ny, distanceMeters=0.6){
+      const threeCam = camEl.getObject3D('camera');
+      if(!threeCam) return;
+
+      // NDC: (-1..1), invertendo Y pra coords de tela
+      const ndcX = nx*2 - 1;
+      const ndcY = -(ny*2 - 1);
+
+      const vec = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(threeCam);
+      const dir = vec.sub(threeCam.position).normalize();
+      const pos = threeCam.position.clone().add(dir.multiplyScalar(distanceMeters));
+
+      modelEl.object3D.position.copy(pos);
+    }
+
+    // ---- MediaPipe Hands
+    const hands = new Hands({
+      locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+    });
     hands.setOptions({
       maxNumHands: 1,
       modelComplexity: 1,
       minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.6,
+      minTrackingConfidence: 0.6
     });
 
-    hands.onResults((results) => {
-      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        const hand = results.multiHandLandmarks[0];
-        const open = isHandOpen(hand);
-        flower.setAttribute("visible", open);
-      } else {
-        flower.setAttribute("visible", false);
+    hands.onResults(res=>{
+      if(res.multiHandLandmarks && res.multiHandLandmarks.length){
+        const lm = res.multiHandLandmarks[0];
+        const open = isHandOpen(lm);
+        modelEl.setAttribute('visible', open);
+        if(open){
+          const c = palmCenter(lm);     // c.x, c.y normalizados (0..1)
+          placeAtScreenPoint(c.x, c.y); // posiciona a flor na palma
+        }
+      }else{
+        modelEl.setAttribute('visible', false);
       }
     });
 
-    // Solicita permissão de câmera traseira e inicia o MediaPipe
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { exact: "environment" } }, // 👈 força a câmera traseira
-          audio: false
-        });
-        videoElement.srcObject = stream;
-        await videoElement.play();
-        console.log("✅ Câmera traseira iniciada com sucesso!");
+    // ---- Câmera: tenta traseira por deviceId; fallback para facingMode
+    async function startCamera(){
+      try{
+        // Primeiro pede permissão com environment (ativa labels no iOS)
+        let stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
+        video.srcObject = stream;
+        await video.play();
 
-        const camera = new Camera(videoElement, {
-          onFrame: async () => {
-            await hands.send({ image: videoElement });
-          },
-          width: 640,
-          height: 480,
+        // Tenta achar a câmera "back" e reabrir com deviceId (mais confiável no iOS)
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cams = devices.filter(d=>d.kind==='videoinput');
+        const back = cams.find(c=>c.label.toLowerCase().includes('back')) || cams[0];
+
+        if(back){
+          const exact = await navigator.mediaDevices.getUserMedia({ video:{ deviceId:{ exact: back.deviceId } }, audio:false });
+          video.srcObject = exact; // troca para a traseira garantida
+          await video.play();
+          stream.getTracks().forEach(t=>t.stop()); // encerra a anterior
+          stream = exact;
+        }
+
+        // Inicia o loop do MediaPipe
+        const cam = new Camera(video, {
+          onFrame: async () => { await hands.send({ image: video }); },
+          width: 640, height: 480
         });
-        camera.start();
-      } catch (err) {
-        console.error("❌ Erro ao acessar a câmera traseira:", err);
-        alert("Não foi possível acessar a câmera traseira. Verifique as permissões do navegador.");
+        cam.start();
+
+        console.log('✅ Câmera OK');
+      }catch(err){
+        console.error('❌ Erro câmera:', err);
+        alert('Não foi possível acessar a câmera. Verifique as permissões do navegador.');
       }
     }
 
-    startCamera();
+    // Voltar
+    document.getElementById('backBtn').addEventListener('click', ()=>{ window.location.href='index.html'; });
 
-    // Botão de voltar
-    document.getElementById('backBtn').addEventListener('click', () => {
-      window.location.href = "index.html";
-    });
+    // GO!
+    startCamera();
   </script>
 </body>
 </html>
