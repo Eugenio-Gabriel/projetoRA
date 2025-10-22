@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>🌼 Flor interativa com a mão</title>
+  <title>🌸 Flor viva na palma</title>
 
   <!-- A-Frame + AR.js -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -21,7 +21,7 @@
       width: 100vw; height: 100vh;
     }
     #arjs-video {
-      filter: brightness(1.1) contrast(1.05) saturate(1.2);
+      filter: brightness(1.15) contrast(1.1) saturate(1.2);
       object-fit: cover;
       transform: scaleX(-1);
     }
@@ -34,13 +34,12 @@
       gltf-model="url(assets/florzinha.glb)"
       visible="false"
       position="0 0 -2"
-      scale="0.1 0.1 0.1">
+      scale="0.01 0.01 0.01">
     </a-entity>
     <a-entity camera></a-entity>
   </a-scene>
 
   <script>
-    // Configuração do MediaPipe Hands
     const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
     hands.setOptions({
       maxNumHands: 1,
@@ -69,10 +68,10 @@
         requestAnimationFrame(loop);
       }
 
-      // Função pra medir abertura (escala)
+      // Mede abertura da mão (ponta do dedo médio até o pulso)
       function getOpenness(hand) {
         const base = hand[0];  // pulso
-        const tip = hand[9];   // centro da palma
+        const tip = hand[12];  // ponta do dedo médio
         const dist = Math.sqrt(
           Math.pow(tip.x - base.x, 2) +
           Math.pow(tip.y - base.y, 2) +
@@ -81,42 +80,31 @@
         return dist;
       }
 
-      // Função pra medir rotação da mão
-      function getRotation(hand) {
-        const thumb = hand[4];
-        const index = hand[8];
-        const dx = index.x - thumb.x;
-        const dy = index.y - thumb.y;
-
-        // converte pra graus e ajusta pra valores visuais
-        const rotY = dx * 180; // rotação lateral
-        const rotX = dy * -180; // rotação vertical invertida
-        return { x: rotX, y: rotY };
-      }
-
-      let currentScale = 0.1;
-      let currentRot = { x: 0, y: 0 };
+      let currentScale = 0.01;
 
       hands.onResults(results => {
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
           const hand = results.multiHandLandmarks[0];
           const openness = getOpenness(hand);
-          const rotation = getRotation(hand);
 
-          // Escala baseada na abertura da mão
-          const min = 0.05, max = 0.15;
+          // Ajuste fino da faixa de abertura
+          const min = 0.05; // bem fechada
+          const max = 0.25; // bem aberta
           let t = (openness - min) / (max - min);
           t = Math.max(0, Math.min(1, t));
-          const targetScale = 0.1 + t * 0.5;
 
-          currentScale += (targetScale - currentScale) * 0.1;
-          currentRot.x += (rotation.x - currentRot.x) * 0.2;
-          currentRot.y += (rotation.y - currentRot.y) * 0.2;
+          // Escala vai de 0 até 2.0
+          const targetScale = 0.05 + t * 2.0;
+          currentScale += (targetScale - currentScale) * 0.15;
 
-          // Aplica rotação e escala ao modelo
+          // Se a mão estiver quase fechada, esconde
+          if (t < 0.1) {
+            model.setAttribute('visible', false);
+          } else {
+            model.setAttribute('visible', true);
+          }
+
           model.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-          model.setAttribute('rotation', `${currentRot.x} ${currentRot.y} 0`);
-          model.setAttribute('visible', true);
         } else {
           model.setAttribute('visible', false);
         }
