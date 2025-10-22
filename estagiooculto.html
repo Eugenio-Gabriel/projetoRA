@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>🌿 Palma AR com Câmera Estilo Hiro</title>
+  <title>🌼 Flor que nasce na palma</title>
 
   <!-- A-Frame + AR.js -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -18,33 +18,28 @@
     a-scene {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100vw; height: 100vh;
     }
-    /* vídeo processado pelo AR.js (textura otimizada e leve correção de cor) */
     #arjs-video {
       filter: brightness(1.1) contrast(1.05) saturate(1.2);
       object-fit: cover;
-      transform: scaleX(-1); /* espelha pra parecer câmera traseira real */
+      transform: scaleX(-1);
     }
   </style>
 </head>
 
 <body>
-  <!-- Cena principal -->
   <a-scene embedded arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;">
     <a-entity id="model"
       gltf-model="url(assets/florzinha.glb)"
       visible="false"
       position="0 0 -2"
-      scale="0.3 0.3 0.3"
-      animation-mixer="clip:*; loop: repeat;">
+      scale="0.1 0.1 0.1">
     </a-entity>
     <a-entity camera></a-entity>
   </a-scene>
 
   <script>
-    // Configuração do MediaPipe Hands
     const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
     hands.setOptions({
       maxNumHands: 1,
@@ -54,9 +49,8 @@
     });
 
     const model = document.getElementById('model');
-    const video = document.querySelector('video'); // AR.js cria internamente o <video>
+    const video = document.querySelector('video');
 
-    // Aguardar a câmera do AR.js inicializar
     video.addEventListener('loadeddata', () => {
       console.log('✅ Câmera AR.js pronta');
       processFrames();
@@ -67,25 +61,44 @@
       const ctx = canvas.getContext('2d');
 
       async function loop() {
-        // ajusta o canvas pro tamanho do vídeo
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
         await hands.send({ image: canvas });
         requestAnimationFrame(loop);
       }
 
+      // Função para medir abertura da mão
+      function getHandOpenness(hand) {
+        const base = hand[0];  // pulso
+        const tip = hand[9];   // centro da palma (entre médio e anelar)
+        const dist = Math.sqrt(
+          Math.pow(tip.x - base.x, 2) +
+          Math.pow(tip.y - base.y, 2) +
+          Math.pow(tip.z - base.z, 2)
+        );
+        return dist; // distância ~ grau de abertura
+      }
+
+      let currentScale = 0.1;
+
       hands.onResults(results => {
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
           const hand = results.multiHandLandmarks[0];
-          const openPalm =
-            hand[8].y < hand[6].y &&
-            hand[12].y < hand[10].y &&
-            hand[16].y < hand[14].y &&
-            hand[20].y < hand[18].y;
+          const openness = getHandOpenness(hand);
 
-          model.setAttribute('visible', openPalm);
+          // Define um limite de abertura (ajusta conforme teu teste)
+          const min = 0.05; // mão fechada
+          const max = 0.15; // mão bem aberta
+          let t = (openness - min) / (max - min);
+          t = Math.max(0, Math.min(1, t)); // limita entre 0 e 1
+
+          // Interpola suavemente o tamanho entre 0 e 0.4
+          const targetScale = 0.1 + t * 0.4;
+          currentScale += (targetScale - currentScale) * 0.1; // suaviza o movimento
+
+          model.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+          model.setAttribute('visible', true);
         } else {
           model.setAttribute('visible', false);
         }
