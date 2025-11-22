@@ -22,20 +22,15 @@
       justify-content: flex-start;
       align-items: center;
       text-align: center;
-      background: linear-gradient(180deg,
-        #5CC9C4 0%,
-        #B3ECE4 45%,
-        #F7F6E6 100%
-      );
-      padding: 6vh 5vw;
-      box-sizing: border-box;
+      background: linear-gradient(180deg, #5CC9C4 0%, #B3ECE4 45%, #F7F6E6 100%);
+      padding: 4vh 4vw;
       overflow-y: auto;
       z-index: 1000;
     }
 
     /* TÍTULO */
     #startScreen h1 {
-      font-size: clamp(28px, 7vw, 38px);
+      font-size: clamp(26px, 7vw, 38px);
       font-weight: 900;
       color: #064F57;
       margin-bottom: 2vh;
@@ -62,12 +57,14 @@
 
     .carousel-track {
       display: flex;
-      gap: 18px;
-      transition: transform 0.4s ease-in-out;
+      gap: 20px;
+      transition: transform 0.3s ease;
     }
 
+    /* CARD RESPONSIVO */
     .marker-card {
-      min-width: 280px;
+      width: 80vw;
+      max-width: 280px;
       background: #ffffffCC;
       border-radius: 20px;
       padding: 20px;
@@ -76,11 +73,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .marker-title {
       font-weight: 700;
-      font-size: 16px;
+      font-size: clamp(15px, 4vw, 18px);
       color: #05575C;
       margin-bottom: 12px;
     }
@@ -94,13 +92,14 @@
     }
 
     .marker-img {
-      width: 180px;
-      height: 180px;
+      width: clamp(130px, 50vw, 180px);
+      height: clamp(130px, 50vw, 180px);
       object-fit: contain;
       border-radius: 12px;
       background: #ffffff;
     }
 
+    /* BOTÕES DO CARROSSEL */
     .carousel-buttons {
       display: flex;
       justify-content: center;
@@ -111,8 +110,8 @@
     .carousel-btn {
       background: #0A676C;
       color: white;
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       font-size: 20px;
       border-radius: 50%;
       border: none;
@@ -171,7 +170,7 @@
 
     <h1>Primeiros Socorros – RA</h1>
 
-    <p>Visualize técnicas de primeiros socorros utilizando marcadores e modelos 3D em Realidade Aumentada.</p>
+    <p>Visualize técnicas de primeiros socorros utilizando modelos 3D em Realidade Aumentada.</p>
 
     <!-- CARROSSEL -->
     <div class="carousel-container">
@@ -212,7 +211,7 @@
     <button id="startBtn">Começar</button>
   </div>
 
-  <div id="liquidEye" onclick="alert('Créditos, versão do projeto ou links extras.')">
+  <div id="liquidEye" onclick="alert('Créditos do projeto ou links extras.')">
     <svg width="50" height="50" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="16" fill="rgba(255,255,255,0.5)"/>
     </svg>
@@ -229,6 +228,11 @@
 
     let index = 0;
 
+    function updateCarousel() {
+      const cardWidth = document.querySelector('.marker-card').offsetWidth + 20; // gap
+      track.style.transform = `translateX(-${index * cardWidth}px)`;
+    }
+
     next.onclick = () => {
       if (index < 2) index++;
       updateCarousel();
@@ -239,9 +243,7 @@
       updateCarousel();
     };
 
-    function updateCarousel() {
-      track.style.transform = `translateX(-${index * 300}px)`;
-    }
+    window.addEventListener('resize', updateCarousel);
   </script>
 
 </body>
