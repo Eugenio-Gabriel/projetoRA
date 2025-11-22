@@ -6,76 +6,90 @@
 <title>Primeiros Socorros – AR</title>
 
 <style>
-  /* FUNDO GERAL */
+  /* ========= FUNDO AJUSTADO PARA IPHONE ========= */
   body {
     margin: 0;
+    padding: 0;
     font-family: "Poppins", sans-serif;
     background: linear-gradient(180deg, #5CC9C4 0%, #B3ECE4 50%, #F7F6E6 100%);
-    min-height: 100vh;
-    height: -webkit-fill-available;
+    height: 100dvh;                /* altura REAL em iPhone/Android */
+    min-height: 100dvh;
+    height: -webkit-fill-available; /* iOS Safari */
+    width: 100%;
+    overflow-x: hidden;
+
+    position: fixed;   /* 🔥 força o fundo a pegar o topo inteiro */
+    inset: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
-    padding-bottom: env(safe-area-inset-bottom);
+    align-items: flex-start;
   }
 
-  /* CONTAINER */
+  /* ========= CONTAINER PRINCIPAL ========== */
   #startScreen {
+    position: absolute;
+    top: env(safe-area-inset-top);
+    bottom: env(safe-area-inset-bottom);
+    left: 0;
+    right: 0;
+
     width: 100%;
-    max-width: 390px;
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 20px 16px 0 16px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    padding: 0 18px;
+
     box-sizing: border-box;
   }
 
-  /* TÍTULO */
+  /* Título */
   #startScreen h1 {
     font-size: clamp(26px, 7vw, 34px);
     font-weight: 900;
     color: #064F57;
-    margin: 0;
     margin-bottom: 6px;
   }
 
   #startScreen p {
     font-size: clamp(14px, 3.8vw, 17px);
     color: #064F57;
-    margin: 0;
     margin-bottom: 18px;
   }
 
-  /* CARROSSEL */
+  /* Carrossel */
   .carousel-container {
     width: 100%;
     overflow: hidden;
-    margin: 0 auto;
     margin-top: 10px;
   }
 
   .carousel-track {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     transition: transform 0.3s ease;
   }
 
   .marker-card {
     background: #ffffffdd;
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 14px;
-    width: 78vw;
-    max-width: 220px;
+    width: 85vw;
+    max-width: 230px;
     flex-shrink: 0;
-    margin: 0 auto;
     border-left: 6px solid #2EA9A0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    margin: 0 auto;
   }
 
   .marker-title {
     font-size: 17px;
     font-weight: 700;
     color: #05575C;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .marker-frame {
@@ -86,18 +100,18 @@
   }
 
   .marker-img {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     object-fit: contain;
     border-radius: 8px;
   }
 
-  /* BOTÕES DO CARROSSEL */
+  /* Botões */
   .carousel-buttons {
     display: flex;
     justify-content: center;
-    gap: 22px;
-    margin-top: 16px;
+    gap: 20px;
+    margin: 16px 0;
   }
 
   .carousel-btn {
@@ -112,9 +126,9 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
 
-  /* BOTÃO COMEÇAR */
+  /* Botão começar */
   #startBtn {
-    margin-top: 22px; /* Espaço harmonioso */
+    margin-top: 14px;
     padding: 0.9em 2.4em;
     font-size: 18px;
     background: linear-gradient(160deg, #3DB7B3, #1D8F8A);
@@ -174,7 +188,7 @@
 
   function updateCarousel() {
     const card = document.querySelector('.marker-card');
-    const cardWidth = card.offsetWidth + 12;
+    const cardWidth = card.offsetWidth + 14;
     track.style.transform = `translateX(-${index * cardWidth}px)`;
   }
 
