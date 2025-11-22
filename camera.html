@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Experiência AR</title>
+
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Poppins', sans-serif; }
+
+    #backBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="backBtn" onclick="window.location.href='index.html'">← Voltar</div>
+
+  <a-scene embedded arjs="sourceType: webcam;" gesture-detector>
+
+    <a-entity camera></a-entity>
+
+    <a-marker type="pattern" url="assets/marcador_maos.patt">
+      <a-entity id="modelMaos" gltf-model="assets/modelo_maos.glb" scale="0.35 0.35 0.35" gesture-handler animation-mixer></a-entity>
+    </a-marker>
+
+    <a-marker type="pattern" url="assets/marcador_engasgo.patt">
+      <a-entity id="modelEngasgo" gltf-model="assets/modelo_engasgo.glb" scale="0.40 0.40 0.40" gesture-handler animation-mixer></a-entity>
+    </a-marker>
+
+    <a-marker type="pattern" url="assets/marcador_afogamento.patt">
+      <a-entity id="modelAfogamento" gltf-model="assets/modelo_afogamento.glb" scale="0.40 0.40 0.40" gesture-handler animation-mixer></a-entity>
+    </a-marker>
+
+  </a-scene>
+
+  <script>
+    const modelos = ["#modelMaos", "#modelEngasgo", "#modelAfogamento"];
+
+    modelos.forEach(id => {
+      const m = document.querySelector(id);
+
+      m.addEventListener("click", () => {
+        const mixer = m.components["animation-mixer"];
+        mixer.timeScale = mixer.timeScale === 1 ? 0 : 1;
+      });
+    });
+  </script>
+
+</body>
+</html>
