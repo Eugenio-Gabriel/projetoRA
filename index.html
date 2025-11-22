@@ -1,171 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Primeiros Socorros – AR</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Primeiros Socorros – AR</title>
 
-  <style>
-    body {
-      margin: 0;
-      overflow-x: hidden;
-      font-family: 'Poppins', sans-serif;
-      background: #DEF4F5;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg, #5CC9C4 0%, #B3ECE4 40%, #F7F6E6 100%);
+    height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    /* TELA INICIAL */
-    #startScreen {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      text-align: center;
+  /* CONTAINER CENTRAL */
+  #startScreen {
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
 
-      background: linear-gradient(180deg, #5CC9C4 0%, #B3ECE4 45%, #F7F6E6 100%);
-      padding: 3vh 4vw;
-      overflow-y: auto;
-      z-index: 1000;
-    }
+  /* TÍTULO */
+  #startScreen h1 {
+    font-size: clamp(26px, 7vw, 36px);
+    font-weight: 900;
+    color: #064F57;
+    margin-bottom: 10px;
+  }
 
-    /* TÍTULO */
-    #startScreen h1 {
-      font-size: clamp(22px, 7vw, 32px);
-      font-weight: 900;
-      color: #064F57;
-      margin-bottom: 1vh;
-      text-shadow: 0px 2px 0px #B6EDE9;
-      letter-spacing: 1px;
-    }
+  #startScreen p {
+    font-size: clamp(14px, 3.8vw, 17px);
+    color: #064F57;
+    margin-top: 4px;
+    margin-bottom: 18px;
+  }
 
-    /* TEXTO */
-    #startScreen p {
-      font-size: clamp(13px, 4vw, 16px);
-      color: #064F57;
-      line-height: 1.5em;
-      max-width: 360px;
-      margin: 0.8vh 0 1vh 0;
-    }
+  /* CARROSSEL */
+  .carousel-container {
+    width: 100%;
+    overflow: hidden;
+    margin: 0 auto;
+  }
 
-    /* CARROSSEL */
-    .carousel-container {
-      width: 100%;
-      max-width: 320px;
-      overflow: hidden;
-      margin: 18px auto 12px auto;
-      position: relative;
-      touch-action: pan-y;
-    }
+  .carousel-track {
+    display: flex;
+    transition: transform 0.3s ease;
+    gap: 16px;
+  }
 
-    .carousel-track {
-      display: flex;
-      gap: 15px;
-      transition: transform 0.25s ease-out;
-    }
+  .marker-card {
+    background: #ffffffcc;
+    border-radius: 20px;
+    padding: 18px;
+    width: 80%;
+    max-width: 260px;
+    border-left: 8px solid #3DB7B3;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+    margin: 0 auto;
+  }
 
-    /* CARD */
-    .marker-card {
-      width: 70vw;
-      max-width: 240px;
-      background: #ffffffd0;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 5px 12px rgba(0,0,0,0.15);
-      border-left: 7px solid #3DB7B3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-    }
+  .marker-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #05575C;
+    margin-bottom: 10px;
+  }
 
-    .marker-title {
-      font-weight: 700;
-      font-size: clamp(14px, 4vw, 16px);
-      color: #05575C;
-      margin-bottom: 10px;
-    }
+  .marker-frame {
+    background: #FFFDF2;
+    border: 3px solid #A2DAD5;
+    border-radius: 14px;
+    padding: 10px;
+  }
 
-    .marker-frame {
-      background: #FFFDF2;
-      border: 2px solid #A2DAD5;
-      border-radius: 12px;
-      padding: 8px;
-      box-shadow: inset 0 2px 3px rgba(0,0,0,0.12);
-    }
+  .marker-img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    background: white;
+    border-radius: 10px;
+  }
 
-    .marker-img {
-      width: clamp(110px, 45vw, 160px);
-      height: clamp(110px, 45vw, 160px);
-      object-fit: contain;
-      border-radius: 10px;
-      background: #ffffff;
-    }
+  /* BOTÕES */
+  .carousel-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin: 14px 0;
+  }
 
-    /* BOTÕES */
-    .carousel-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-    }
+  .carousel-btn {
+    background: #0A676C;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
 
-    .carousel-btn {
-      background: #0A676C;
-      color: white;
-      width: 36px;
-      height: 36px;
-      font-size: 18px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    }
-
-    /* BOTÃO COMEÇAR */
-    #startBtn {
-      margin-top: 1vh;
-      padding: 0.8em 2.4em;
-      font-size: clamp(14px, 4vw, 17px);
-      border: none;
-      border-radius: 14px;
-      background: linear-gradient(160deg, #3DB7B3, #1D8F8A);
-      color: #ffffff;
-      font-weight: 800;
-      box-shadow: 0 5px 0 #0A5E5A, 0 3px 10px rgba(0,0,0,0.25);
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    #startBtn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #0A5E5A;
-    }
-
-    /* OLHO */
-    #liquidEye {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 50px;
-      height: 50px;
-      background: rgba(255,255,255,0.25);
-      border-radius: 50%;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 30px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      z-index: 900;
-    }
-
-    #liquidEye svg {
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
-    }
-  </style>
+  #startBtn {
+    padding: 1em 3em;
+    font-size: 18px;
+    background: linear-gradient(160deg, #3DB7B3, #1D8F8A);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 800;
+    box-shadow: 0 6px 0 #0A5E5A;
+    cursor: pointer;
+  }
+</style>
 </head>
 
 <body>
@@ -173,11 +127,10 @@
 <div id="startScreen">
 
   <h1>Primeiros Socorros – RA</h1>
-
   <p>Visualize técnicas de primeiros socorros utilizando modelos 3D em Realidade Aumentada.</p>
 
   <!-- CARROSSEL -->
-  <div class="carousel-container" id="carouselContainer">
+  <div class="carousel-container">
     <div class="carousel-track" id="carouselTrack">
 
       <div class="marker-card">
@@ -198,7 +151,7 @@
     </div>
   </div>
 
-  <!-- BOTÕES MANUAIS -->
+  <!-- Botões -->
   <div class="carousel-buttons">
     <button class="carousel-btn" id="prevBtn">‹</button>
     <button class="carousel-btn" id="nextBtn">›</button>
@@ -207,87 +160,19 @@
   <button id="startBtn">Começar</button>
 </div>
 
-<!-- OLHO -->
-<div id="liquidEye" onclick="alert('Créditos do projeto ou links extras.')">
-  <svg width="40" height="40" viewBox="0 0 64 64">
-    <circle cx="32" cy="32" r="16" fill="rgba(255,255,255,0.5)"/>
-  </svg>
-</div>
-
 <script>
-  document.getElementById("startBtn").addEventListener("click", () => {
-    window.location.href = "camera.html";
-  });
-
   const track = document.getElementById('carouselTrack');
-  const container = document.getElementById('carouselContainer');
   const prev = document.getElementById('prevBtn');
   const next = document.getElementById('nextBtn');
-
   let index = 0;
 
   function updateCarousel() {
-    const cardWidth = document.querySelector('.marker-card').offsetWidth + 15;
+    const cardWidth = document.querySelector('.marker-card').offsetWidth + 16;
     track.style.transform = `translateX(-${index * cardWidth}px)`;
   }
 
-  next.onclick = () => {
-    if (index < 2) index++;
-    updateCarousel();
-  };
-
-  prev.onclick = () => {
-    if (index > 0) index--;
-    updateCarousel();
-  };
-
-  /* SWIPE / ARRASTAR COM DEDO */
-  let startX = 0;
-  let isDragging = false;
-
-  container.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    isDragging = true;
-  });
-
-  container.addEventListener('touchmove', e => {
-    if (!isDragging) return;
-    let dx = e.touches[0].clientX - startX;
-
-    track.style.transform = `translateX(calc(-${index * (document.querySelector('.marker-card').offsetWidth + 15)}px + ${dx}px))`;
-  });
-
-  container.addEventListener('touchend', e => {
-    isDragging = false;
-    let dx = e.changedTouches[0].clientX - startX;
-
-    if (dx < -60 && index < 2) index++;
-    if (dx > 60 && index > 0) index--;
-
-    updateCarousel();
-  });
-
-  /* Suporte ao mouse (arrastar no desktop) */
-  container.addEventListener('mousedown', e => {
-    startX = e.clientX;
-    isDragging = true;
-  });
-
-  container.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    let dx = e.clientX - startX;
-    track.style.transform = `translateX(calc(-${index * (document.querySelector('.marker-card').offsetWidth + 15)}px + ${dx}px))`;
-  });
-
-  container.addEventListener('mouseup', e => {
-    isDragging = false;
-    let dx = e.clientX - startX;
-
-    if (dx < -60 && index < 2) index++;
-    if (dx > 60 && index > 0) index--;
-
-    updateCarousel();
-  });
+  next.onclick = () => { if (index < 2) index++; updateCarousel(); };
+  prev.onclick = () => { if (index > 0) index--; updateCarousel(); };
 
   window.addEventListener('resize', updateCarousel);
 </script>
