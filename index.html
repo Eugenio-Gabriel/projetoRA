@@ -6,61 +6,65 @@
 <title>Primeiros Socorros – AR</title>
 
 <style>
-  /* Fundo */
+  /* FUNDO GERAL */
   body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     background: linear-gradient(180deg, #5CC9C4 0%, #B3ECE4 50%, #F7F6E6 100%);
+    min-height: 100vh;
+    height: -webkit-fill-available;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: env(safe-area-inset-top);
+    align-items: center;
     overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Container principal */
+  /* CONTAINER */
   #startScreen {
     width: 100%;
-    max-width: 380px;
-    margin-top: 40px;
+    max-width: 390px;
     text-align: center;
-    padding: 0 16px;
+    padding: 0 18px;
+    box-sizing: border-box;
   }
 
-  /* Título */
+  /* TÍTULO */
   #startScreen h1 {
     font-size: clamp(26px, 7vw, 34px);
     font-weight: 900;
     color: #064F57;
+    margin: 0;
     margin-bottom: 6px;
   }
 
   #startScreen p {
     font-size: clamp(14px, 3.8vw, 17px);
     color: #064F57;
+    margin: 0;
     margin-bottom: 18px;
   }
 
-  /* Carrossel */
+  /* CARROSSEL */
   .carousel-container {
     width: 100%;
     overflow: hidden;
     margin: 0 auto;
+    margin-top: 10px;
   }
 
   .carousel-track {
     display: flex;
+    gap: 12px;
     transition: transform 0.3s ease;
-    gap: 14px;
   }
 
   .marker-card {
     background: #ffffffdd;
-    border-radius: 18px;
+    border-radius: 16px;
     padding: 14px;
-    width: 85vw;
-    max-width: 230px;
+    width: 78vw;
+    max-width: 220px;
     flex-shrink: 0;
     margin: 0 auto;
     border-left: 6px solid #2EA9A0;
@@ -71,7 +75,7 @@
     font-size: 17px;
     font-weight: 700;
     color: #05575C;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .marker-frame {
@@ -82,18 +86,18 @@
   }
 
   .marker-img {
-    width: 130px;
-    height: 130px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
     border-radius: 8px;
   }
 
-  /* Botões */
+  /* BOTÕES DO CARROSSEL */
   .carousel-buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin: 16px 0;
+    gap: 22px;
+    margin-top: 16px;
   }
 
   .carousel-btn {
@@ -108,9 +112,9 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
 
-  /* Botão começar */
+  /* BOTÃO COMEÇAR */
   #startBtn {
-    margin-top: 12px;
+    margin-top: 22px; /* Espaço harmonioso */
     padding: 0.9em 2.4em;
     font-size: 18px;
     background: linear-gradient(160deg, #3DB7B3, #1D8F8A);
@@ -170,7 +174,7 @@
 
   function updateCarousel() {
     const card = document.querySelector('.marker-card');
-    const cardWidth = card.offsetWidth + 14;
+    const cardWidth = card.offsetWidth + 12;
     track.style.transform = `translateX(-${index * cardWidth}px)`;
   }
 
