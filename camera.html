@@ -36,14 +36,14 @@
 
     <a-entity camera></a-entity>
 
-    <!-- 🔵 AGORA O MARCADOR DAS MÃOS USA HIRO -->
+    <!-- 🔵 MARCADOR DAS MÃOS (HIRO) -->
     <a-marker preset="hiro">
       <a-entity 
         id="modelMaos" 
-        gltf-model="assets/maos.glb" 
-        scale="0.35 0.35 0.35" 
-        gesture-handler 
-        animation-mixer>
+        gltf-model="assets/maos.glb"
+        scale="0.35 0.35 0.35"
+        gesture-handler
+        animation-mixer="timeScale: 0.4"> <!-- velocidade 40% mais lenta -->
       </a-entity>
     </a-marker>
 
@@ -58,6 +58,7 @@
   </a-scene>
 
   <script>
+    // PAUSE/PLAY PARA TODOS OS MODELOS
     const modelos = ["#modelMaos", "#modelEngasgo", "#modelAfogamento"];
 
     modelos.forEach(id => {
@@ -65,8 +66,14 @@
 
       m.addEventListener("click", () => {
         const mixer = m.components["animation-mixer"];
-        mixer.timeScale = mixer.timeScale === 1 ? 0 : 1;
+        mixer.timeScale = mixer.timeScale === 0 ? 1 : 0;  // pausa/play
       });
+    });
+
+    // AJUSTE EXTRA: DEIXAR SOMENTE AS MÃOS MAIS LENTAS
+    document.querySelector("#modelMaos").addEventListener("model-loaded", () => {
+      const mixer = document.querySelector("#modelMaos").components["animation-mixer"];
+      mixer.timeScale = 0.4; // deixa lento automaticamente ao carregar
     });
   </script>
 
