@@ -36,8 +36,15 @@
 
     <a-entity camera></a-entity>
 
-    <a-marker type="pattern" url="assets/marcador_maos.patt">
-      <a-entity id="modelMaos" gltf-model="assets/modelo_maos.glb" scale="0.35 0.35 0.35" gesture-handler animation-mixer></a-entity>
+    <!-- 🔵 AGORA O MARCADOR DAS MÃOS USA HIRO -->
+    <a-marker preset="hiro">
+      <a-entity 
+        id="modelMaos" 
+        gltf-model="assets/maos.glb" 
+        scale="0.35 0.35 0.35" 
+        gesture-handler 
+        animation-mixer>
+      </a-entity>
     </a-marker>
 
     <a-marker type="pattern" url="assets/marcador_engasgo.patt">
