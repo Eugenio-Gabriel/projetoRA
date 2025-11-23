@@ -6,39 +6,32 @@
 <title>Primeiros Socorros – AR</title>
 
 <style>
-  /* ========= FUNDO RESPONSIVO ========= */
   body {
     margin: 0;
     padding: 0;
     font-family: "Poppins", sans-serif;
     background: linear-gradient(180deg, #5CC9C4 0%, #B3ECE4 45%, #F7F6E6 100%);
-    
     min-height: 100dvh;
     display: flex;
     justify-content: center;
   }
 
-  /* ========= CONTAINER PRINCIPAL ========= */
   #startScreen {
     width: 100%;
     max-width: 380px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-
     padding: calc(env(safe-area-inset-top) + 15px) 16px 20px;
     box-sizing: border-box;
   }
 
-  /* ========= TÍTULO NA POSIÇÃO ORIGINAL ========= */
   #startScreen h1 {
     font-size: clamp(26px, 7vw, 34px);
     font-weight: 900;
     color: #064F57;
-    margin-top: 0;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
 
   #startScreen p {
@@ -48,28 +41,27 @@
     max-width: 340px;
   }
 
-  /* ========= ÁREA CENTRAL: CARROSSEL + BOTÕES + COMEÇAR ========= */
   .center-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    flex: 1;   /* 🔥 Isso faz a área ficar centralizada no restante da tela */
+    flex: 1;
     width: 100%;
   }
 
-  /* Carrossel */
+  /* CARROSSEL COM SNAP */
   .carousel-container {
     width: 100%;
-    overflow: hidden;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 
   .carousel-track {
     display: flex;
-    gap: 14px;
-    transition: transform 0.3s ease;
-    justify-content: center;
+    gap: 16px;
+    padding-bottom: 10px;
   }
 
   .marker-card {
@@ -78,6 +70,7 @@
     padding: 14px;
     width: 80vw;
     max-width: 230px;
+    scroll-snap-align: center;
     flex-shrink: 0;
     border-left: 6px solid #2EA9A0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
@@ -104,29 +97,29 @@
     border-radius: 8px;
   }
 
-  /* Botões */
-  .carousel-buttons {
+  /* BOLINHAS DO CARROSSEL */
+  .dots {
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin: 18px 0;
+    gap: 8px;
+    margin-top: 12px;
+    margin-bottom: 15px;
   }
 
-  .carousel-btn {
-    background: #0A676C;
-    color: white;
-    width: 38px;
-    height: 38px;
+  .dot {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    border: none;
-    font-size: 22px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    background: #0a676c40;
+    transition: 0.3s;
   }
 
-  /* Botão começar */
+  .dot.active {
+    background: #0A676C;
+    transform: scale(1.3);
+  }
+
   #startBtn {
-    margin-top: 10px;
+    margin-top: 5px;
     padding: 1em 3em;
     font-size: 18px;
     background: linear-gradient(160deg, #3DB7B3, #1D8F8A);
@@ -143,46 +136,39 @@
 <body>
 
 <div id="startScreen">
-<h1></h1>
-  <h1>Primeiros Socorros – RA</h1>
-  
 
-  <!-- 🔥 TUDO QUE PRECISA FICAR CENTRALIZADO VAI AQUI -->
   <div class="center-content">
+  <h1>Primeiros Socorros – RA</h1>
+
     <p>Visualize técnicas de primeiros socorros utilizando modelos 3D em Realidade Aumentada.</p>
 
     <!-- CARROSSEL -->
-    <div class="carousel-container">
-      <div class="carousel-track" id="carouselTrack">
+    <div class="carousel-container" id="carousel">
+      <div class="carousel-track">
 
         <div class="marker-card">
           <p class="marker-title">Posição das Mãos</p>
-          <div class="marker-frame">
-            <img src="assets/marcador_maos.png" class="marker-img">
-          </div>
+          <div class="marker-frame"><img src="assets/marcador_maos.png" class="marker-img"></div>
         </div>
 
         <div class="marker-card">
           <p class="marker-title">Engasgo</p>
-          <div class="marker-frame">
-            <img src="assets/marcador_engasgo.png" class="marker-img">
-          </div>
+          <div class="marker-frame"><img src="assets/marcador_engasgo.png" class="marker-img"></div>
         </div>
 
         <div class="marker-card">
           <p class="marker-title">Afogamento</p>
-          <div class="marker-frame">
-            <img src="assets/marcador_afogamento.png" class="marker-img">
-          </div>
+          <div class="marker-frame"><img src="assets/marcador_afogamento.png" class="marker-img"></div>
         </div>
 
       </div>
     </div>
 
-    <!-- Botões -->
-    <div class="carousel-buttons">
-      <button class="carousel-btn" id="prevBtn">‹</button>
-      <button class="carousel-btn" id="nextBtn">›</button>
+    <!-- PONTINHOS -->
+    <div class="dots" id="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
 
     <button id="startBtn">Começar</button>
@@ -191,22 +177,22 @@
 </div>
 
 <script>
-  const track = document.getElementById('carouselTrack');
-  const prev = document.getElementById('prevBtn');
-  const next = document.getElementById('nextBtn');
-  let index = 0;
+  const carousel = document.getElementById("carousel");
+  const dots = document.querySelectorAll(".dot");
+  const cards = document.querySelectorAll(".marker-card");
 
-  function updateCarousel() {
-    const card = document.querySelector('.marker-card');
-    const cardWidth = card.offsetWidth + 14;
-    track.style.transform = `translateX(-${index * cardWidth}px)`;
+  function updateDots() {
+    const scrollPos = carousel.scrollLeft;
+    let cardWidth = cards[0].offsetWidth + 16;
+
+    let index = Math.round(scrollPos / cardWidth);
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === index);
+    });
   }
 
-  next.onclick = () => { if (index < 2) index++; updateCarousel(); };
-  prev.onclick = () => { if (index > 0) index--; updateCarousel(); };
-
-  window.addEventListener('resize', updateCarousel);
-  updateCarousel();
+  carousel.addEventListener("scroll", updateDots);
 </script>
 
 </body>
