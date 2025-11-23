@@ -20,7 +20,7 @@
     align-items: center;
   }
 
-  /* 🔥 BOTÃO VOLTAR FIXO NO CANTO ESQUERDO */
+  /* Botão Voltar */
   #backBtnTop {
     position: fixed;
     top: 15px;
@@ -72,13 +72,14 @@
     background: #EAF7F5;
   }
 
+  /* Botões lado a lado */
   .btn-row {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 12px;
   }
 
-  .btn-ar, .btn-floor {
+  .btn-ar, .btn-details {
     flex: 1;
     padding: 10px;
     border: none;
@@ -88,20 +89,50 @@
     cursor: pointer;
   }
 
-  .btn-ar {
-    background: #1D8F8A;
+  .btn-ar { background: #1D8F8A; }
+  .btn-details { background: #05575C; }
+
+  /* Modal padrão */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.4);
+    z-index: 2000;
   }
 
-  .btn-floor {
+  .details-box {
+    background: white;
+    width: 85%;
+    max-width: 420px;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+    text-align: left;
+    color: #05575C;
+  }
+
+  .close-modal {
+    margin-top: 18px;
     background: #0A676C;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    width: 100%;
   }
-
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 BOTÃO VOLTAR NO CANTO ESQUERDO -->
 <button id="backBtnTop" onclick="window.location.href='index.html'">← Voltar</button>
 
 <header>
@@ -109,11 +140,13 @@
   <p>Visualize os modelos antes de iniciar a câmera</p>
 </header>
 
-<!-- CARD 1 — MÃOS -->
+<!-- =============================== -->
+<!-- 🌿 CARD 1 — ARECA -->
+<!-- =============================== -->
 <div class="viewer-card">
-  <div class="viewer-title">Posição das Mãos</div>
+  <div class="viewer-title">Areca – Planta Decorativa</div>
 
-  <model-viewer id="maosViewer"
+  <model-viewer
     src="assets/palm_plant.glb"
     auto-rotate
     camera-controls
@@ -122,21 +155,88 @@
   </model-viewer>
 
   <div class="btn-row">
-    <button class="btn-ar" onclick="window.location.href='camera.html'">
-      AR com Marcador
-    </button>
-
-    <button class="btn-floor" onclick="document.querySelector('#maosViewer').activateAR()">
-      AR sem Marcador
-    </button>
+    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
+    <button class="btn-details" onclick="openAreca()">Ver Detalhes</button>
   </div>
 </div>
 
-<!-- CARD 2 — AFOGAMENTO -->
+<!-- =============================== -->
+<!-- 🌿 CARD 2 — MONSTERA -->
+<!-- =============================== -->
 <div class="viewer-card">
-  <div class="viewer-title">Afogamento – Procedimento</div>
-  <model-viewer src="assets/administering.glb" auto-rotate camera-controls></model-viewer>
+  <div class="viewer-title">Monstera Deliciosa – Costela-de-Adão</div>
+
+  <model-viewer
+    src="assets/monstera.glb"
+    auto-rotate
+    camera-controls
+    ar
+    ar-modes="scene-viewer webxr quick-look">
+  </model-viewer>
+
+  <div class="btn-row">
+    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
+    <button class="btn-details" onclick="openMonstera()">Ver Detalhes</button>
+  </div>
 </div>
+
+<!-- =============================== -->
+<!-- MODAL ARECA -->
+<!-- =============================== -->
+<div id="modalAreca" class="modal-overlay">
+  <div class="details-box">
+    <h3>Areca (Dypsis lutescens)</h3>
+    <p>
+      A Areca é uma planta tropical popular em ambientes internos por trazer leveza,
+      elegância e sensação de bem-estar.<br><br>
+
+      <strong>Benefícios:</strong><br>
+      • Purifica o ar<br>
+      • Aumenta a umidade<br>
+      • Reduz desconforto respiratório<br>
+      • No Feng Shui, atrai boas energias e equilíbrio
+    </p>
+    <button class="close-modal" onclick="closeAreca()">Fechar</button>
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- MODAL MONSTERA -->
+<!-- =============================== -->
+<div id="modalMonstera" class="modal-overlay">
+  <div class="details-box">
+    <h3>Monstera Deliciosa (Costela-de-Adão)</h3>
+    <p>
+      A Monstera é famosa por suas folhas grandes e recortadas, trazendo elegância
+      e modernidade para o ambiente.<br><br>
+
+      <strong>Benefícios:</strong><br>
+      • Purifica e refresca o ar<br>
+      • Eleva a umidade<br>
+      • Melhora energia e criatividade<br>
+      • No Feng Shui, simboliza crescimento e prosperidade
+    </p>
+    <button class="close-modal" onclick="closeMonstera()">Fechar</button>
+  </div>
+</div>
+
+<script>
+  /* ARECA */
+  function openAreca() {
+    document.getElementById("modalAreca").style.display = "flex";
+  }
+  function closeAreca() {
+    document.getElementById("modalAreca").style.display = "none";
+  }
+
+  /* MONSTERA */
+  function openMonstera() {
+    document.getElementById("modalMonstera").style.display = "flex";
+  }
+  function closeMonstera() {
+    document.getElementById("modalMonstera").style.display = "none";
+  }
+</script>
 
 </body>
 </html>
