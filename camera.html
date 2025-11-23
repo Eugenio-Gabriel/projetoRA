@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta-name viewport content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Experiência AR</title>
 
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -36,44 +36,58 @@
 
     <a-entity camera></a-entity>
 
-    <!-- 🔵 MARCADOR DAS MÃOS (HIRO) -->
-    <a-marker preset="hiro">
+    <!-- 🟠 MARCADOR HIRO PARA AS MÃOS -->
+    <a-marker preset="kanji">
       <a-entity 
-        id="modelMaos" 
+        id="modelMaos"
         gltf-model="assets/maos.glb"
         scale="0.35 0.35 0.35"
         gesture-handler
-        animation-mixer="timeScale: 0.4"> <!-- velocidade 40% mais lenta -->
+        animation-mixer="timeScale: 0.4">
       </a-entity>
     </a-marker>
 
-    <a-marker type="pattern" url="assets/marcador_engasgo.patt">
-      <a-entity id="modelEngasgo" gltf-model="assets/modelo_engasgo.glb" scale="0.40 0.40 0.40" gesture-handler animation-mixer></a-entity>
+    <!-- 🔵 MARCADOR HIRO PARA AFOGAMENTO (se quiser usar 2 HIRO distintos, precisa trocar para 'kanji') -->
+    <a-marker preset="hiro">
+      <a-entity 
+        id="modelAfogamento"
+        gltf-model="assets/afogamento.glb"
+        scale="0.35 0.35 0.35"
+        gesture-handler
+        animation-mixer="timeScale: 0.4">
+      </a-entity>
     </a-marker>
 
+    <!-- 🟢 MARCADOR PERSONALIZADO (.patt) PARA AFOGAMENTO -->
     <a-marker type="pattern" url="assets/marcador_afogamento.patt">
-      <a-entity id="modelAfogamento" gltf-model="assets/modelo_afogamento.glb" scale="0.40 0.40 0.40" gesture-handler animation-mixer></a-entity>
+      <a-entity 
+        id="modelAfogamentoCustom"
+        gltf-model="assets/modelo_afogamento.glb"
+        scale="0.40 0.40 0.40"
+        gesture-handler
+        animation-mixer>
+      </a-entity>
     </a-marker>
 
   </a-scene>
 
   <script>
-    // PAUSE/PLAY PARA TODOS OS MODELOS
-    const modelos = ["#modelMaos", "#modelEngasgo", "#modelAfogamento"];
+    // PLAY/PAUSE
+    const modelos = ["#modelMaos", "#modelAfogamento", "#modelAfogamentoCustom"];
 
     modelos.forEach(id => {
       const m = document.querySelector(id);
+      if (!m) return;
 
       m.addEventListener("click", () => {
         const mixer = m.components["animation-mixer"];
-        mixer.timeScale = mixer.timeScale === 0 ? 1 : 0;  // pausa/play
+        mixer.timeScale = mixer.timeScale === 0 ? 1 : 0;
       });
     });
 
-    // AJUSTE EXTRA: DEIXAR SOMENTE AS MÃOS MAIS LENTAS
     document.querySelector("#modelMaos").addEventListener("model-loaded", () => {
       const mixer = document.querySelector("#modelMaos").components["animation-mixer"];
-      mixer.timeScale = 0.4; // deixa lento automaticamente ao carregar
+      mixer.timeScale = 0.4;
     });
   </script>
 
