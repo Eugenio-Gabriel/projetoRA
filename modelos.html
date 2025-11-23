@@ -181,61 +181,89 @@
 </div>
 
 <!-- =============================== -->
-<!-- MODAL ARECA -->
+<!-- 🌿 CARD 3 — DRACENA VARIEGATA -->
 <!-- =============================== -->
+<div class="viewer-card">
+  <div class="viewer-title">Dracena Variegata – Planta de Interior</div>
+
+  <model-viewer
+    src="assets/indoor_plant.glb"
+    auto-rotate
+    camera-controls
+    ar
+    ar-modes="scene-viewer webxr quick-look">
+  </model-viewer>
+
+  <div class="btn-row">
+    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
+    <button class="btn-details" onclick="openDracena()">Ver Detalhes</button>
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- MODAIS -->
+<!-- =============================== -->
+
+<!-- ARECA -->
 <div id="modalAreca" class="modal-overlay">
   <div class="details-box">
     <h3>Areca (Dypsis lutescens)</h3>
     <p>
-      A Areca é uma planta tropical popular em ambientes internos por trazer leveza,
-      elegância e sensação de bem-estar.<br><br>
-
+      A Areca é uma planta tropical popular por trazer leveza e bem-estar.<br><br>
       <strong>Benefícios:</strong><br>
       • Purifica o ar<br>
       • Aumenta a umidade<br>
-      • Reduz desconforto respiratório<br>
-      • No Feng Shui, atrai boas energias e equilíbrio
+      • Excelente para respiração<br>
+      • Atrai equilíbrio energético
     </p>
     <button class="close-modal" onclick="closeAreca()">Fechar</button>
   </div>
 </div>
 
-<!-- =============================== -->
-<!-- MODAL MONSTERA -->
-<!-- =============================== -->
+<!-- MONSTERA -->
 <div id="modalMonstera" class="modal-overlay">
   <div class="details-box">
     <h3>Monstera Deliciosa (Costela-de-Adão)</h3>
     <p>
-      A Monstera é famosa por suas folhas grandes e recortadas, trazendo elegância
-      e modernidade para o ambiente.<br><br>
-
+      Planta elegante com folhas grandes e recortadas.<br><br>
       <strong>Benefícios:</strong><br>
       • Purifica e refresca o ar<br>
       • Eleva a umidade<br>
       • Melhora energia e criatividade<br>
-      • No Feng Shui, simboliza crescimento e prosperidade
+      • Representa crescimento
     </p>
     <button class="close-modal" onclick="closeMonstera()">Fechar</button>
   </div>
 </div>
 
+<!-- DRACENA -->
+<div id="modalDracena" class="modal-overlay">
+  <div class="details-box">
+    <h3>Dracena Variegata (Dracaena fragrans)</h3>
+    <p>
+      A Dracena é resistente e muito usada em interiores por sua estética moderna.<br><br>
+      <strong>Benefícios:</strong><br>
+      • Purifica o ar (remove toxinas)<br>
+      • Muito resistente e fácil de cuidar<br>
+      • Ideal para escritórios e quartos<br>
+      • Traz energia de vitalidade e renovação
+    </p>
+    <button class="close-modal" onclick="closeDracena()">Fechar</button>
+  </div>
+</div>
+
 <script>
   /* ARECA */
-  function openAreca() {
-    document.getElementById("modalAreca").style.display = "flex";
-  }
-  function closeAreca() {
-    document.getElementById("modalAreca").style.display = "none";
-  }
+  function openAreca() { document.getElementById("modalAreca").style.display = "flex"; }
+  function closeAreca() { document.getElementById("modalAreca").style.display = "none"; }
 
   /* MONSTERA */
-  function openMonstera() {
-    document.getElementById("modalMonstera").style.display = "flex";
-  }
-  function closeMonstera() {
-    document.getElementById("modalMonstera").style.display = "none";
-  }
+  function openMonstera() { document.getElementById("modalMonstera").style.display = "flex"; }
+  function closeMonstera() { document.getElementById("modalMonstera").style.display = "none"; }
+
+  /* DRACENA */
+  function openDracena() { document.getElementById("modalDracena").style.display = "flex"; }
+  function closeDracena() { document.getElementById("modalDracena").style.display = "none"; }
 </script>
 
 </body>
