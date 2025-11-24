@@ -49,7 +49,7 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.152.2';
 import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.152.2/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
-let xrSession, reticle;
+let xrSession, reticle, hitTestSource = null;
 let plantModel;
 
 // Sugestões automáticas
@@ -60,32 +60,47 @@ const suggestions = [
   "Lugar ideal! Perfeito para criar um ambiente mais natural."
 ];
 
-const suggestionBox = document.getElementById("suggestionBox");
 function showSuggestion() {
-  suggestionBox.innerText = suggestions[Math.floor(Math.random() * suggestions.length)];
-  suggestionBox.style.display = "block";
-  setTimeout(() => { suggestionBox.style.display = "none"; }, 3500);
+  const box = document.getElementById("suggestionBox");
+  box.innerText = suggestions[Math.floor(Math.random() * suggestions.length)];
+  box.style.display = "block";
+  setTimeout(() => box.style.display = "none", 3500);
 }
 
-// INICIALIZAÇÃO
 init();
 
 async function init() {
-  const container = document.body;
 
+  // ======================================
+  // 🔥 1. VERIFICAÇÃO DE SUPORTE WEBXR
+  // ======================================
+  if (!navigator.xr) {
+    alert("Seu dispositivo não suporta WebXR. Use Android + Chrome.");
+    return;
+  }
+
+  const supported = await navigator.xr.isSessionSupported("immersive-ar");
+  if (!supported) {
+    alert("Este dispositivo não suporta AR sem marcador.\nSafari (iPhone) não funciona.");
+    return;
+  }
+
+  // ======================================
+  // 🔥 2. RENDERER + CENA
+  // ======================================
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
-  container.appendChild(renderer.domElement);
+  document.body.appendChild(renderer.domElement);
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera();
 
-  // Luz
-  const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-  scene.add(light);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8888ff, 1));
 
-  // Reticle (ponto onde a planta vai aparecer)
+  // ======================================
+  // 🔥 3. RETÍCULO
+  // ======================================
   reticle = new THREE.Mesh(
     new THREE.RingGeometry(0.1, 0.12, 32),
     new THREE.MeshBasicMaterial({ color: 0x00ff99 })
@@ -94,14 +109,18 @@ async function init() {
   reticle.visible = false;
   scene.add(reticle);
 
-  // Carregar planta
+  // ======================================
+  // 🔥 4. CARREGAR A PLANTA
+  // ======================================
   const loader = new GLTFLoader();
   loader.load("assets/palm_plant.glb", (gltf) => {
     plantModel = gltf.scene;
     plantModel.scale.set(0.4, 0.4, 0.4);
   });
 
-  // Iniciar AR
+  // ======================================
+  // 🔥 5. INICIAR SESSÃO AR
+  // ======================================
   xrSession = await navigator.xr.requestSession("immersive-ar", {
     requiredFeatures: ["hit-test", "dom-overlay"],
     domOverlay: { root: document.body }
@@ -111,33 +130,34 @@ async function init() {
 
   const referenceSpace = await xrSession.requestReferenceSpace("local");
   const viewerSpace = await xrSession.requestReferenceSpace("viewer");
-  const hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
 
+  hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
+
+  // ======================================
+  // 🔥 6. LOOP DA ANIMAÇÃO
+  // ======================================
   renderer.setAnimationLoop((timestamp, frame) => {
     if (!frame) return;
 
-    const hitTestResults = frame.getHitTestResults(hitTestSource);
+    const hits = frame.getHitTestResults(hitTestSource);
 
-    if (hitTestResults.length > 0) {
-      const pose = hitTestResults[0].getPose(referenceSpace);
+    if (hits.length > 0) {
+      const pose = hits[0].getPose(referenceSpace);
       reticle.visible = true;
-      reticle.position.set(
-        pose.transform.position.x,
-        pose.transform.position.y,
-        pose.transform.position.z
-      );
+      reticle.position.copy(pose.transform.position);
     }
 
     renderer.render(scene, camera);
   });
 
-  // Toque na tela para colocar planta
+  // ======================================
+  // 🔥 7. TOQUE PARA COLOCAR A PLANTA
+  // ======================================
   renderer.domElement.addEventListener("click", () => {
     if (reticle.visible && plantModel) {
       const clone = plantModel.clone();
       clone.position.copy(reticle.position);
       scene.add(clone);
-
       showSuggestion();
     }
   });

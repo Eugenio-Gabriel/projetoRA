@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Modelos 3D – Visualização</title>
 
-<!-- Model Viewer -->
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 <style>
@@ -137,19 +136,7 @@
   <p>Visualize os modelos antes de iniciar a câmera</p>
 </header>
 
-<!-- ========================= -->
-<!-- CARD 1 – ARECA -->
-<!-- ========================= -->
-<div class="viewer-card">
-  <div class="viewer-title">Areca – Planta Decorativa</div>
-  <model-viewer src="assets/palm_plant.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
-  <div class="btn-row">
-    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
-    <button class="btn-details" onclick="openAreca()">Ver Detalhes</button>
-  </div>
-</div>
-
-<!-- CARD 2 – MONSTERA -->
+<!-- CARD – MONSTERA -->
 <div class="viewer-card">
   <div class="viewer-title">Monstera Deliciosa – Costela-de-Adão</div>
   <model-viewer src="assets/monstera.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
@@ -159,7 +146,7 @@
   </div>
 </div>
 
-<!-- CARD 3 – DRACENA -->
+<!-- CARD – DRACENA -->
 <div class="viewer-card">
   <div class="viewer-title">Dracena Variegata – Planta de Interior</div>
   <model-viewer src="assets/indoor_plant.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
@@ -169,7 +156,7 @@
   </div>
 </div>
 
-<!-- CARD 4 – PHLOX -->
+<!-- CARD – PHLOX -->
 <div class="viewer-card">
   <div class="viewer-title">Blanket Phlox – Flox Rasteira</div>
   <model-viewer src="assets/blanket_phlox.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
@@ -179,7 +166,7 @@
   </div>
 </div>
 
-<!-- CARD 5 – RHIZOME -->
+<!-- CARD – RHIZOME -->
 <div class="viewer-card">
   <div class="viewer-title">Rhizome Plant – Planta Tropical</div>
   <model-viewer src="assets/rhyzome_plant.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
@@ -189,261 +176,90 @@
   </div>
 </div>
 
-<!-- ⭐ NOVO CARD – TULIP ⭐ -->
-<div class="viewer-card">
-  <div class="viewer-title">KEJORA Tulip – Arranjo Floral</div>
-  <model-viewer src="assets/kejora-02_tulip.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
-  <div class="btn-row">
-    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
-    <button class="btn-details" onclick="openTulip()">Ver Detalhes</button>
-  </div>
-</div>
-
-<!-- ⭐ NOVO CARD – WK9 TREES AND PLANTS ⭐ -->
-<div class="viewer-card">
-  <div class="viewer-title">WK9 Trees And Plants – Ornamental</div>
-
-  <model-viewer
-    src="assets/wk9_trees_and_plants.glb"
-    auto-rotate
-    camera-controls
-    ar
-    ar-modes="scene-viewer webxr quick-look">
-  </model-viewer>
-
-  <div class="btn-row">
-    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
-    <button class="btn-details" onclick="openWK9()">Ver Detalhes</button>
-  </div>
-</div>
-
-<!-- ========================= -->
-<!-- MODAIS -->
-<!-- ========================= -->
-
-<!-- MODAL ARECA -->
-<div id="modalAreca" class="modal-overlay">
-  <div class="details-box">
-    <h3>Areca (Dypsis lutescens)</h3>
-    <p>
-      Planta leve, tropical e muito purificadora.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Purifica o ar<br>
-      • Aumenta a umidade<br>
-      • Ajuda na respiração<br>
-      • Traz equilíbrio energético
-    </p>
-    <button class="close-modal" onclick="closeAreca()">Fechar</button>
-  </div>
-</div>
-
-<!-- MODAL MONSTERA -->
-<div id="modalMonstera" class="modal-overlay">
-  <div class="details-box">
-    <h3>Monstera Deliciosa</h3>
-    <p>
-      Planta elegante e símbolo de crescimento.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Purifica o ar<br>
-      • Eleva a umidade<br>
-      • Melhora criatividade<br>
-      • Perfeita para decoração moderna
-    </p>
-    <button class="close-modal" onclick="closeMonstera()">Fechar</button>
-  </div>
-</div>
-
-<!-- MODAL DRACENA -->
-<div id="modalDracena" class="modal-overlay">
-  <div class="details-box">
-    <h3>Dracena Variegata</h3>
-    <p>
-      Planta resistente ideal para interiores.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Purifica toxinas do ar<br>
-      • Fácil de cuidar<br>
-      • Boa para quartos e escritórios<br>
-      • Traz energia renovadora
-    </p>
-    <button class="close-modal" onclick="closeDracena()">Fechar</button>
-  </div>
-</div>
-
-<!-- MODAL PHLOX -->
-<div id="modalPhlox" class="modal-overlay">
-  <div class="details-box">
-    <h3>Blanket Phlox</h3>
-    <p>
-      Planta rasteira muito ornamental.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Ideal para cobrir superfícies<br>
-      • Atrai polinizadores<br>
-      • Muito decorativa<br>
-      • Traz suavidade ao ambiente
-    </p>
-    <button class="close-modal" onclick="closePhlox()">Fechar</button>
-  </div>
-</div>
-
-<!-- MODAL RHIZOME -->
-<div id="modalRhizome" class="modal-overlay">
-  <div class="details-box">
-    <h3>Rhizome Plant</h3>
-    <p>
-      Planta tropical ideal para interiores iluminados.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Traz sensação de frescor<br>
-      • Fácil de manter<br>
-      • Excelente para mesas e aparadores<br>
-      • Energia leve e natural
-    </p>
-    <button class="close-modal" onclick="closeRhizome()">Fechar</button>
-  </div>
-</div>
-
-<!-- MODAL TULIP -->
-<div id="modalTulip" class="modal-overlay">
-  <div class="details-box">
-    <h3>KEJORA Tulip</h3>
-    <p>
-      Arranjo floral elegante com tulipas rosadas.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Símbolo de amor e delicadeza<br>
-      • Ótima para salas e mesas<br>
-      • Visual acolhedor<br>
-      • Não tóxica
-    </p>
-    <button class="close-modal" onclick="closeTulip()">Fechar</button>
-  </div>
-</div>
-
-<!-- MODAL WK9 TREES -->
-<div id="modalWK9" class="modal-overlay">
-  <div class="details-box">
-    <h3>WK9 Trees And Plants</h3>
-    <p>
-      Planta ornamental de troncos entrelaçados, muito presente em decorações asiáticas.<br><br>
-      <strong>Benefícios:</strong><br>
-      • Representa longevidade e equilíbrio<br>
-      • Excelente para salas e halls<br>
-      • Traz sensação de organização e calma<br>
-      • Boa para energia do ambiente (feng shui)
-    </p>
-    <button class="close-modal" onclick="closeWK9()">Fechar</button>
-  </div>
-</div>
-
-<!-- ========================= -->
-<!-- ⭐ NOVO CARD – CACTUS ⭐ -->
-<!-- ========================= -->
-<div class="viewer-card">
-  <div class="viewer-title">Cactus – Cacto Ornamental</div>
-
-  <model-viewer
-    src="assets/cactus.glb"
-    auto-rotate
-    camera-controls
-    ar
-    ar-modes="scene-viewer webxr quick-look">
-  </model-viewer>
-
-  <div class="btn-row">
-    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
-    <button class="btn-details" onclick="openCactus()">Ver Detalhes</button>
-  </div>
-</div>
-
-<!-- ========================= -->
-<!-- ⭐ MODAL – CACTUS ⭐ -->
-<!-- ========================= -->
-<div id="modalCactus" class="modal-overlay">
-  <div class="details-box">
-    <h3>Cactus (Cacto)</h3>
-
-    <p>
-      O cacto é uma planta extremamente resistente, ideal para ambientes internos
-      e pessoas que desejam baixa manutenção.<br><br>
-
-      <strong>Benefícios:</strong><br>
-      • Requer pouca água e cuidado<br>
-      • Purifica o ar<br>
-      • Representa proteção e força<br>
-      • Ótimo para mesas, estantes e decoração moderna
-    </p>
-
-    <button class="close-modal" onclick="closeCactus()">Fechar</button>
-  </div>
-</div>
-<!-- ========================= -->
-<!-- CARD – ARMERIA MARITIMA -->
-<!-- ========================= -->
+<!-- CARD – ARMERIA -->
 <div class="viewer-card">
   <div class="viewer-title">Armeria Marítima – Planta Ornamental</div>
-
-  <model-viewer
-    src="assets/flower_armeria.glb"
-    auto-rotate
-    camera-controls
-    ar
-    ar-modes="scene-viewer webxr quick-look">
-  </model-viewer>
-
+  <model-viewer src="assets/flower_armeria.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
   <div class="btn-row">
     <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
     <button class="btn-details" onclick="openArmeria()">Ver Detalhes</button>
   </div>
 </div>
 
+<!-- NOVO CARD – ORCHIDEA -->
+<div class="viewer-card">
+  <div class="viewer-title">Orchidea – Orquídea Rosa</div>
+  <model-viewer src="assets/orchidea.glb" auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look"></model-viewer>
+  <div class="btn-row">
+    <button class="btn-ar" onclick="window.location.href='camera.html'">Ver Experiência AR</button>
+    <button class="btn-details" onclick="openOrchidea()">Ver Detalhes</button>
+  </div>
+</div>
+
 <!-- ========================= -->
-<!-- MODAL – ARMERIA MARITIMA -->
+<!-- MODAIS -->
 <!-- ========================= -->
+<div id="modalMonstera" class="modal-overlay">
+  <div class="details-box">
+    <h3>Monstera Deliciosa</h3>
+    <p>Planta elegante e símbolo de crescimento.<br><br><strong>Benefícios:</strong><br>• Purifica o ar<br>• Eleva a umidade<br>• Melhora criatividade<br>• Perfeita para decoração moderna</p>
+    <button class="close-modal" onclick="closeMonstera()">Fechar</button>
+  </div>
+</div>
+
+<div id="modalDracena" class="modal-overlay">
+  <div class="details-box">
+    <h3>Dracena Variegata</h3>
+    <p>Planta resistente ideal para interiores.<br><br><strong>Benefícios:</strong><br>• Purifica toxinas do ar<br>• Fácil de cuidar<br>• Boa para quartos e escritórios<br>• Traz energia renovadora</p>
+    <button class="close-modal" onclick="closeDracena()">Fechar</button>
+  </div>
+</div>
+
+<div id="modalPhlox" class="modal-overlay">
+  <div class="details-box">
+    <h3>Blanket Phlox</h3>
+    <p>Planta rasteira muito ornamental.<br><br><strong>Benefícios:</strong><br>• Ideal para cobrir superfícies<br>• Atrai polinizadores<br>• Muito decorativa<br>• Traz suavidade ao ambiente</p>
+    <button class="close-modal" onclick="closePhlox()">Fechar</button>
+  </div>
+</div>
+
+<div id="modalRhizome" class="modal-overlay">
+  <div class="details-box">
+    <h3>Rhizome Plant</h3>
+    <p>Planta tropical ideal para interiores iluminados.<br><br><strong>Benefícios:</strong><br>• Traz sensação de frescor<br>• Fácil de manter<br>• Excelente para mesas e aparadores<br>• Energia leve e natural</p>
+    <button class="close-modal" onclick="closeRhizome()">Fechar</button>
+  </div>
+</div>
+
 <div id="modalArmeria" class="modal-overlay">
   <div class="details-box">
     <h3>Armeria maritima</h3>
-    <p>
-      É uma planta ornamental resistente, conhecida por suas flores pequenas e redondas em tons rosados.
-      Ideal para vasos e ambientes bem iluminados.<br><br>
-
-      <strong>Benefícios:</strong><br>
-      • Fácil de cuidar<br>
-      • Resistente ao calor<br>
-      • Perfeita para decoração minimalista<br>
-      • Transmite leveza e elegância ao ambiente
-    </p>
+    <p>Planta ornamental resistente com flores rosadas.<br><br><strong>Benefícios:</strong><br>• Fácil de cuidar<br>• Resistente ao calor<br>• Perfeita para decoração minimalista<br>• Transmite leveza e elegância</p>
     <button class="close-modal" onclick="closeArmeria()">Fechar</button>
   </div>
 </div>
 
+<div id="modalOrchidea" class="modal-overlay">
+  <div class="details-box">
+    <h3>Orchidea (Orquídea Rosa)</h3>
+    <p>Flor elegante e simbólica, conhecida pela sua beleza e harmonia.<br><br><strong>Benefícios:</strong><br>• Decoração refinada e natural<br>• Representa amor, beleza e serenidade<br>• Ideal para interiores iluminados<br>• Transmite leveza e sofisticação</p>
+    <button class="close-modal" onclick="closeOrchidea()">Fechar</button>
+  </div>
+</div>
 
 <script>
-  function openAreca() { modalAreca.style.display = "flex"; }
-  function closeAreca() { modalAreca.style.display = "none"; }
-
-  function openMonstera() { modalMonstera.style.display = "flex"; }
-  function closeMonstera() { modalMonstera.style.display = "none"; }
-
-  function openDracena() { modalDracena.style.display = "flex"; }
-  function closeDracena() { modalDracena.style.display = "none"; }
-
-  function openPhlox() { modalPhlox.style.display = "flex"; }
-  function closePhlox() { modalPhlox.style.display = "none"; }
-
-  function openRhizome() { modalRhizome.style.display = "flex"; }
-  function closeRhizome() { modalRhizome.style.display = "none"; }
-
-  function openTulip() { modalTulip.style.display = "flex"; }
-  function closeTulip() { modalTulip.style.display = "none"; }
-
-  function openWK9() { modalWK9.style.display = "flex"; }
-  function closeWK9() { modalWK9.style.display = "none"; }
-
-  function openCactus() { modalCactus.style.display = "flex"; }
-  function closeCactus() { modalCactus.style.display = "none"; }
-
-  function openArmeria() { modalArmeria.style.display = "flex"; }
-  function closeArmeria() { modalArmeria.style.display = "none"; }
-
-
+  function openMonstera(){modalMonstera.style.display="flex";}
+  function closeMonstera(){modalMonstera.style.display="none";}
+  function openDracena(){modalDracena.style.display="flex";}
+  function closeDracena(){modalDracena.style.display="none";}
+  function openPhlox(){modalPhlox.style.display="flex";}
+  function closePhlox(){modalPhlox.style.display="none";}
+  function openRhizome(){modalRhizome.style.display="flex";}
+  function closeRhizome(){modalRhizome.style.display="none";}
+  function openArmeria(){modalArmeria.style.display="flex";}
+  function closeArmeria(){modalArmeria.style.display="none";}
+  function openOrchidea(){modalOrchidea.style.display="flex";}
+  function closeOrchidea(){modalOrchidea.style.display="none";}
 </script>
 
 </body>
